@@ -23,10 +23,11 @@ if (process.env.LABELER_DID === 'DUMMY') {
 }
 
 if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
+    console.log('ここにいる')
     const server = new LabelerServer({
         did: process.env.LABELER_DID || '',
         signingKey: process.env.LABELER_SIGNED_SEC_KEY || '',
-        dbPath: process.env.SKYWARE_DB_PATH || 'data/skyware.db'
+        dbPath: process.env.DB_PATH+'skyware.db' || '/data/skyware.db'
     });
     server.start(
         { port, host: '0.0.0.0' }, // ← FastifyListenOptions
