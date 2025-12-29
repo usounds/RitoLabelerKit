@@ -18,6 +18,15 @@ const server = new LabelerServer({
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 14831;
 
+if(process.env.LABELER_DID === 'DUMMY'){
+    logger.info(`This service need to more setup. Please go to the following site.`)
+    logger.info(`https://label.rito.blue`)
+    if(process.env.RAILWAY_PUBLIC_DOMAIN){
+    logger.info(`You also help following this server's domain.`)
+    logger.info(process.env.RAILWAY_PUBLIC_DOMAIN)
+    }
+}
+
 if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
 server.start(
   { port, host: '0.0.0.0' }, // ← FastifyListenOptions
@@ -313,16 +322,24 @@ jetstream.onCreate('app.bsky.feed.post', (event: CommitCreateEvent<'app.bsky.fee
 });
 
 
+let reconnectAttempts = 0;
+const maxReconnect = 5;
+
 jetstream.on('close', () => {
     clearInterval(cursorUpdateInterval);
     logger.warn(`Jetstream connection closed.`);
-    process.exit(1);
+    if (reconnectAttempts < maxReconnect) {
+        reconnectAttempts++;
+        setTimeout(() => jetstream.start(), 1000 * reconnectAttempts); // リトライ遅延
+    } else {
+        logger.error('Max reconnect attempts reached.');
+        process.exit(1);
+    }
 });
 
 jetstream.on('error', (error) => {
     logger.error(`Jetstream error: ${error.message}`);
     jetstream.close();
-    process.exit(1);
 });
 
 if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
