@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "blue.rito.label.auto.like.settings",
+  "defs": {
+    "postRef": {
+      "type": "object",
+      "required": ["uri", "cid"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "description": "URI of the post"
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the post"
+        }
+      }
+    },
+    "main": {
+      "key": "literal:self",
+      "type": "record",
+      "description": "Setting Like based auto labeling.",
+      "record": {
+        "type": "object",
+        "required": ["apply", "createdAt"],
+        "properties": {
+          "apply": {
+            "type": "union",
+            "refs": ["blue.rito.label.auto.like.settings#postRef"],
+            "description": "The post to apply the label to"
+          },
+          "delete": {
+            "type": "union",
+            "refs": ["blue.rito.label.auto.like.settings#postRef"],
+            "description": "The post to remove the label from"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  },
+  "$type": "com.atproto.lexicon.schema"
+}

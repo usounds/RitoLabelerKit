@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "blue.rito.label.auto.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Setting Post based auto labeling.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "label",
+          "condition",
+          "appliedTo",
+          "durationInHours",
+          "createdAt"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "If condition are matched, which label are applyed or removed."
+          },
+          "condition": {
+            "type": "string",
+            "description": "Setting apply condition with regex"
+          },
+          "appliedTo": {
+            "type": "string",
+            "description": "'account' or 'post'"
+          },
+          "action": {
+            "type": "string",
+            "description": "Required for 'account', It should be 'add' or 'remove'"
+          },
+          "durationInHours": {
+            "type": "integer",
+            "description": "Hour based label dulation. 0 will be no duration."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

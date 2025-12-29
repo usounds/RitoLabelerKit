@@ -1,0 +1,8 @@
+onlyBuiltDependencies:
+  - '@atcute/time-ms'
+  - '@parcel/watcher'
+  - '@swc/core'
+  - better-sqlite3
+  - core-js
+  - sharp
+  - unrs-resolver
