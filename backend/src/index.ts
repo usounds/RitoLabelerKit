@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import { getCursor, setCursor, upsertLike, deleteLike, db, upsertLikeSubject, deleteLikeSubject, upsertPost, deletePost } from './lib/db.js';
 import { memoryDB, LikeRecord, PostRecord, LikeSubjectRecord } from './lib/type.js';
 import logger from './lib/logger.js';
+import { applyLabelForUser, removeLabelForUser } from './lib/atcute.js'
 import type { } from './lexicons/index.js'
 import PQueue from 'p-queue';
 import 'dotenv/config'
@@ -138,6 +139,7 @@ if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
             }
 
             logger.info(`Bluesky like create detected for tracked post: ${likeSubjectUri} -> ${targetPost.rkey}`);
+            await applyLabelForUser(event.did, [targetPost.rkey])
         });
     });
 
@@ -151,12 +153,12 @@ if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
             const idx = memoryDB.likeSubjects.findIndex(ls => ls.subjectUri === likeUri);
             if (idx >= 0) {
                 const removed = memoryDB.likeSubjects.splice(idx, 1)[0];
-                console.log(removed)
 
                 // DB 側も削除
                 deleteLikeSubject(removed.subjectUri);
 
                 logger.info(`Bluesky like removed: ${likeUri} -> ${removed.rkey} `);
+                await removeLabelForUser(event.did, [removed.rkey])
             }
         });
     });

@@ -10,8 +10,9 @@
 	"dependencies": {
 		"@atcute/client": "^4.1.2",
 		"@atcute/ozone": "^3.1.13",
+		"@fastify/websocket": "^11.2.0",
 		"@skyware/jetstream": "^0.2.5",
-		"@skyware/labeler": "^0.2.0",
+		"@skyware/labeler": "0.2.0",
 		"better-sqlite3": "^12.5.0",
 		"dotenv": "^17.2.3",
 		"p-queue": "^9.0.1",
