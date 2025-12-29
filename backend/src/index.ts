@@ -16,7 +16,7 @@ const server = new LabelerServer({
     dbPath:process.env.SKYWARE_DB_PATH||'data/skyware.db'
 });
 
-server.start(14831, (error) => {
+server.start(8080, (error) => {
     if (error) {
         console.error("Failed to start server:", error);
     } else {
