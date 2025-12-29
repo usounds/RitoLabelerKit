@@ -322,15 +322,20 @@ if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
     });
 
 
+    const reconnectDelay = 500; // 0.5秒
     let reconnectAttempts = 0;
-    const maxReconnect = 5;
+    const maxReconnect = 10;
 
     jetstream.on('close', () => {
         clearInterval(cursorUpdateInterval);
         logger.warn(`Jetstream connection closed.`);
+
         if (reconnectAttempts < maxReconnect) {
             reconnectAttempts++;
-            setTimeout(() => jetstream.start(), 1000 * reconnectAttempts); // リトライ遅延
+            setTimeout(() => {
+                logger.info(`Reconnecting Jetstream (attempt ${reconnectAttempts})...`);
+                jetstream.start();
+            }, reconnectDelay);
         } else {
             logger.error('Max reconnect attempts reached.');
             process.exit(1);
