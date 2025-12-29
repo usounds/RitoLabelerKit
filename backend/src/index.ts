@@ -18,13 +18,16 @@ const server = new LabelerServer({
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 14831;
 
-server.start(port, (error) => {
-  if (error) {
-    console.error("Failed to start server:", error);
-  } else {
-    console.log(`Labeler server running on port ${port}`);
+server.start(
+  { port, host: '0.0.0.0' }, // ← FastifyListenOptions
+  (error, address) => {
+    if (error) {
+      console.error("Failed to start server:", error);
+    } else {
+      console.log(`Labeler server running at ${address}`);
+    }
   }
-});
+);
 
 let cursor = 0;
 let prev_time_us = 0
