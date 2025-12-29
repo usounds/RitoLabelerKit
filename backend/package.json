@@ -4,8 +4,8 @@
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
-		"start": "npx tsx src/index.ts",
-		"lex-gen": "npx lex-cli generate -c ./lex.config.mjs"
+		"start": "pnpm dlx tsx src/index.ts",
+		"lex-gen": "pnpm dlx lex-cli generate -c ./lex.config.mjs"
 	},
 	"dependencies": {
 		"@atcute/client": "^4.1.2",
