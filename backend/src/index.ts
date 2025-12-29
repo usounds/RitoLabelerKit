@@ -18,6 +18,7 @@ const server = new LabelerServer({
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 14831;
 
+if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
 server.start(
   { port, host: '0.0.0.0' }, // ← FastifyListenOptions
   (error, address) => {
@@ -28,6 +29,7 @@ server.start(
     }
   }
 );
+}
 
 let cursor = 0;
 let prev_time_us = 0
@@ -323,4 +325,6 @@ jetstream.on('error', (error) => {
     process.exit(1);
 });
 
+if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
 jetstream.start();
+}
