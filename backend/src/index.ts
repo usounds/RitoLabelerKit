@@ -10,8 +10,6 @@ const queue = new PQueue({ concurrency: 1 });
 
 import { LabelerServer } from "@skyware/labeler";
 
-
-
 const port = process.env.PORT ? parseInt(process.env.PORT) : 14831;
 
 if (process.env.LABELER_DID === 'DUMMY') {
@@ -321,30 +319,16 @@ if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
         });
     });
 
-
-    const reconnectDelay = 500; // 0.5秒
-    let reconnectAttempts = 0;
-    const maxReconnect = 10;
-
     jetstream.on('close', () => {
         clearInterval(cursorUpdateInterval);
         logger.warn(`Jetstream connection closed.`);
-
-        if (reconnectAttempts < maxReconnect) {
-            reconnectAttempts++;
-            setTimeout(() => {
-                logger.info(`Reconnecting Jetstream (attempt ${reconnectAttempts})...`);
-                jetstream.start();
-            }, reconnectDelay);
-        } else {
-            logger.error('Max reconnect attempts reached.');
-            process.exit(1);
-        }
+        process.exit(1);
     });
 
     jetstream.on('error', (error) => {
         logger.error(`Jetstream error: ${error.message}`);
         jetstream.close();
+        process.exit(1);
     });
 
     jetstream.start();
