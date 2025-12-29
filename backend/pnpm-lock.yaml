@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@skyware/labeler':
-    hash: 80ce9b7ae13eb85ace7113b447fd5304adc9aae910895b752e7b5018aea4b0a7
-    path: patches/@skyware__labeler.patch
+  '@skyware/labeler@0.2.0':
+    hash: 1a02ad5490ed80ac73639df98d51d4c416a2fc4cacc66ca63f9888c910feeb1e
+    path: patches/@skyware__labeler@0.2.0.patch
 
 importers:
 
@@ -27,7 +27,7 @@ importers:
         version: 0.2.5
       '@skyware/labeler':
         specifier: 0.2.0
-        version: 0.2.0(patch_hash=80ce9b7ae13eb85ace7113b447fd5304adc9aae910895b752e7b5018aea4b0a7)
+        version: 0.2.0(patch_hash=1a02ad5490ed80ac73639df98d51d4c416a2fc4cacc66ca63f9888c910feeb1e)
       better-sqlite3:
         specifier: ^12.5.0
         version: 12.5.0
@@ -1236,7 +1236,7 @@ snapshots:
       partysocket: 1.1.10
       tiny-emitter: 2.1.0
 
-  '@skyware/labeler@0.2.0(patch_hash=80ce9b7ae13eb85ace7113b447fd5304adc9aae910895b752e7b5018aea4b0a7)':
+  '@skyware/labeler@0.2.0(patch_hash=1a02ad5490ed80ac73639df98d51d4c416a2fc4cacc66ca63f9888c910feeb1e)':
     dependencies:
       '@atcute/bluesky': 1.0.15(@atcute/client@2.0.9)
       '@atcute/cbor': 1.0.7
