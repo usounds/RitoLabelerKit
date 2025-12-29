@@ -16,12 +16,14 @@ const server = new LabelerServer({
     dbPath:process.env.SKYWARE_DB_PATH||'data/skyware.db'
 });
 
-server.start(8080, (error) => {
-    if (error) {
-        console.error("Failed to start server:", error);
-    } else {
-        console.log("Labeler server running on port 14831");
-    }
+const port = process.env.PORT ? parseInt(process.env.PORT) : 14831;
+
+server.start(port, (error) => {
+  if (error) {
+    console.error("Failed to start server:", error);
+  } else {
+    console.log(`Labeler server running on port ${port}`);
+  }
 });
 
 let cursor = 0;

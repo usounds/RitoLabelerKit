@@ -993,7 +993,7 @@ snapshots:
     dependencies:
       '@atcute/uint8array': 1.0.6
 
-  '@atcute/ozone@1.0.12(@atcute/bluesky@1.0.15(@atcute/client@4.1.2))(@atcute/client@2.0.9)':
+  '@atcute/ozone@1.0.12(@atcute/bluesky@1.0.15(@atcute/client@2.0.9))(@atcute/client@2.0.9)':
     dependencies:
       '@atcute/bluesky': 1.0.15(@atcute/client@2.0.9)
       '@atcute/client': 2.0.9
@@ -1218,7 +1218,7 @@ snapshots:
       '@atcute/bluesky': 1.0.15(@atcute/client@2.0.9)
       '@atcute/cbor': 1.0.7
       '@atcute/client': 2.0.9
-      '@atcute/ozone': 1.0.12(@atcute/bluesky@1.0.15(@atcute/client@4.1.2))(@atcute/client@2.0.9)
+      '@atcute/ozone': 1.0.12(@atcute/bluesky@1.0.15(@atcute/client@2.0.9))(@atcute/client@2.0.9)
       '@fastify/websocket': 10.0.1
       '@libsql/client': 0.14.0
       '@noble/curves': 1.9.7
