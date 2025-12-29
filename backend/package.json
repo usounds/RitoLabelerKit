@@ -1,4 +1,7 @@
 {
+	"name": "rito-labeler-kit",
+	"version": "0.0.1",
+	"main": "src/index.ts",
 	"scripts": {
 		"start": "npx tsx src/index.ts",
 		"lex-gen": "npx lex-cli generate -c ./lex.config.mjs"
