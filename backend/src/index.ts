@@ -10,34 +10,35 @@ const queue = new PQueue({ concurrency: 1 });
 
 import { LabelerServer } from "@skyware/labeler";
 
-const server = new LabelerServer({
-    did: process.env.LABELER_DID||'',
-    signingKey: process.env.LABELER_SIGNED_SEC_KEY||'',
-    dbPath:process.env.SKYWARE_DB_PATH||'data/skyware.db'
-});
+
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 14831;
 
-if(process.env.LABELER_DID === 'DUMMY'){
+if (process.env.LABELER_DID === 'DUMMY') {
     logger.info(`This service need to more setup. Please go to the following site.`)
     logger.info(`https://label.rito.blue`)
-    if(process.env.RAILWAY_PUBLIC_DOMAIN){
-    logger.info(`You also help following this server's domain.`)
-    logger.info(process.env.RAILWAY_PUBLIC_DOMAIN)
+    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+        logger.info(`You also help following this server's domain.`)
+        logger.info(process.env.RAILWAY_PUBLIC_DOMAIN)
     }
 }
 
 if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
-server.start(
-  { port, host: '0.0.0.0' }, // ← FastifyListenOptions
-  (error, address) => {
-    if (error) {
-      console.error("Failed to start server:", error);
-    } else {
-      console.log(`Labeler server running at ${address}`);
-    }
-  }
-);
+    const server = new LabelerServer({
+        did: process.env.LABELER_DID || '',
+        signingKey: process.env.LABELER_SIGNED_SEC_KEY || '',
+        dbPath: process.env.SKYWARE_DB_PATH || 'data/skyware.db'
+    });
+    server.start(
+        { port, host: '0.0.0.0' }, // ← FastifyListenOptions
+        (error, address) => {
+            if (error) {
+                console.error("Failed to start server:", error);
+            } else {
+                console.log(`Labeler server running at ${address}`);
+            }
+        }
+    );
 }
 
 let cursor = 0;
@@ -218,35 +219,35 @@ jetstream.onDelete('blue.rito.label.auto.like', (event: CommitDeleteEvent<'blue.
 
 // Post自動反映
 export function handlePostEvent(rkey: string, data: {
-  tid: string;
-  label: string;
-  condition: string;
-  appliedTo: 'account' | 'post';
-  action?: 'add' | 'remove';
-  durationInHours: number;
-  createdAt: string;
+    tid: string;
+    label: string;
+    condition: string;
+    appliedTo: 'account' | 'post';
+    action?: 'add' | 'remove';
+    durationInHours: number;
+    createdAt: string;
 }) {
-  // DB に保存
-  upsertPost(rkey, data);
-  logger.info(`Upsert Post def. ${rkey}`);
+    // DB に保存
+    upsertPost(rkey, data);
+    logger.info(`Upsert Post def. ${rkey}`);
 
-  // オンメモリに反映
-  const idx = memoryDB.posts.findIndex(p => p.rkey === rkey);
-  const postRecord: PostRecord = {
-    rkey,
-    label: data.label,
-    condition: data.condition,
-    appliedTo: data.appliedTo,
-    action: data.action,
-    durationInHours: data.durationInHours,
-    createdAt: data.createdAt,
-  };
+    // オンメモリに反映
+    const idx = memoryDB.posts.findIndex(p => p.rkey === rkey);
+    const postRecord: PostRecord = {
+        rkey,
+        label: data.label,
+        condition: data.condition,
+        appliedTo: data.appliedTo,
+        action: data.action,
+        durationInHours: data.durationInHours,
+        createdAt: data.createdAt,
+    };
 
-  if (idx >= 0) {
-    memoryDB.posts[idx] = postRecord;
-  } else {
-    memoryDB.posts.push(postRecord);
-  }
+    if (idx >= 0) {
+        memoryDB.posts[idx] = postRecord;
+    } else {
+        memoryDB.posts.push(postRecord);
+    }
 }
 
 // 共通処理
@@ -305,7 +306,7 @@ jetstream.onCreate('app.bsky.feed.post', (event: CommitCreateEvent<'app.bsky.fee
                 if (regex.test(text)) {
                     // ラベルを適用する処理
                     logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey}`);
-                    
+
                     // DB に保存
                     upsertPost(postRule.rkey, postRule);
 
@@ -343,5 +344,5 @@ jetstream.on('error', (error) => {
 });
 
 if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
-jetstream.start();
+    jetstream.start();
 }
