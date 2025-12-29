@@ -4,13 +4,13 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "baseUrl": "src",
     "types": ["node"],
-       "paths": {
-      "@/*": ["./src/*"]
+    "paths": {
+      "@/*": ["*"]
     }
-  },
-  "include": ["src/**/*.ts"]
+  }
 }

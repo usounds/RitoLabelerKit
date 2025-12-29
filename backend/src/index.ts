@@ -1,13 +1,28 @@
 import { CommitCreateEvent, CommitUpdateEvent, CommitDeleteEvent, Jetstream } from '@skyware/jetstream';
 import WebSocket from 'ws';
-import { getCursor, setCursor, upsertLike, deleteLike, db, upsertLikeSubject, deleteLikeSubject, upsertPost, deletePost } from '@/lib/db';
-import { memoryDB, LikeRecord, PostRecord, LikeSubjectRecord } from '@/lib/type';
-import logger from '@/lib/logger';
+import { getCursor, setCursor, upsertLike, deleteLike, db, upsertLikeSubject, deleteLikeSubject, upsertPost, deletePost } from './lib/db.js';
+import { memoryDB, LikeRecord, PostRecord, LikeSubjectRecord } from './lib/type.js';
+import logger from './lib/logger.js';
+import type { } from './lexicons/index.js'
 import PQueue from 'p-queue';
-import type { } from '@/lexicons'
 import 'dotenv/config'
-import { BlueRitoLabelAutoLikeSettings, BlueRitoLabelAutoLike, BlueRitoLabelAutoPost } from '@/lexicons/index';
 const queue = new PQueue({ concurrency: 1 });
+
+import { LabelerServer } from "@skyware/labeler";
+
+const server = new LabelerServer({
+    did: process.env.LABELER_DID||'',
+    signingKey: process.env.LABELER_SIGNED_SEC_KEY||'',
+    dbPath:process.env.SKYWARE_DB_PATH||'data/skyware.db'
+});
+
+server.start(14831, (error) => {
+    if (error) {
+        console.error("Failed to start server:", error);
+    } else {
+        console.log("Labeler server running on port 14831");
+    }
+});
 
 let cursor = 0;
 let prev_time_us = 0

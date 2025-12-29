@@ -1,8 +1,21 @@
 import Database from 'better-sqlite3';
-const dbPath = process.env.DATABASE_PATH || 'data.db';
-export const db = new Database(dbPath);
+import fs from 'node:fs';
+import path from 'node:path';
 
-// --- テーブル作成 ---
+// 環境変数から DB パスを取得。なければデフォルト
+const dbPath =  'data/ritoLabelerLit.db';
+
+// DB ディレクトリが存在しなければ作る
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+// SQLite DB インスタンスを作成
+export const db = new Database(dbPath);
+console.log(`Database initialized at: ${dbPath}`);
+
+// --- テーブル作成 ---s
 db.prepare(`
   CREATE TABLE IF NOT EXISTS cursor (
     name TEXT PRIMARY KEY,

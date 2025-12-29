@@ -2,6 +2,7 @@
 	"name": "rito-labeler-kit",
 	"version": "0.0.1",
 	"main": "src/index.ts",
+  "type": "module",
 	"scripts": {
 		"start": "npx tsx src/index.ts",
 		"lex-gen": "npx lex-cli generate -c ./lex.config.mjs"
@@ -10,6 +11,7 @@
 		"@atcute/client": "^4.1.2",
 		"@atcute/ozone": "^3.1.13",
 		"@skyware/jetstream": "^0.2.5",
+		"@skyware/labeler": "^0.2.0",
 		"better-sqlite3": "^12.5.0",
 		"dotenv": "^17.2.3",
 		"p-queue": "^9.0.1",
