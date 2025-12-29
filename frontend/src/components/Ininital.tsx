@@ -1,6 +1,7 @@
 "use client"
 import { didDocumentResolver, isPlcOrWebDid } from '@/lib/HandleAgent';
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
+import UserButton from "@/components/User/UserButton";
 import { AppBskyActorDefs } from '@atcute/bluesky';
 import { Client } from '@atcute/client';
 import { Alert, Button, Center, Group, Stack, Stepper, Text, Textarea, TextInput } from '@mantine/core';
@@ -44,9 +45,12 @@ export default function Inital({ userProf }: InitalProps) {
     }
 
     const downloadSecKey = () => {
-        if (!secKey) return;
+        if (!secKey || !userProf?.did) return;
 
-        const blob = new Blob([secKey], { type: 'text/plain' });
+        // ファイル内容を環境変数形式にする
+        const content = `LABELER_DID=${userProf.did}\nLABELER_SIGNED_SEC_KEY=${secKey}`;
+
+        const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
 
         const a = document.createElement('a');
@@ -186,20 +190,50 @@ export default function Inital({ userProf }: InitalProps) {
     return (
         <>
             <Stepper active={active} onStepClick={setActive}>
-                <Stepper.Step label={t('initlal.title.1')} description={t('initlal.description.1')}>
-                    {(userProf?.postsCount || 0) > 0 && (
-                        <Stack align="flex-start">
-                            <Center style={{ width: '100%' }}>
-                                <Alert variant="light" color="red" icon={<MessageCircleWarning />}>{t('initlal.posted')}</Alert>
-                            </Center>
-                        </Stack>
-                    )}
 
-                    <Group justify="center" mt="xl">
+                {/* 左寄せ */}
+                <Stepper.Step
+                    label={t('initlal.title.1')}
+                    description={t('initlal.description.1')}
+                >
+                    {/* 左寄せ */}
+                    <Stack align="start" >
+                        <UserButton userProf={userProf} />
+
+                        {(userProf?.postsCount || 0) > 0 && (
+                            <Alert
+                                variant="light"
+                                color="red"
+                                icon={<MessageCircleWarning />}
+                                style={{ width: '100%' }}
+                            >
+                                {t('initlal.posted')}
+                            </Alert>
+                        )}
+                    </Stack>
+
+                    {/* 中央寄せボタン */}
+                    <Group align="center" justify="center" mt="xl">
                         <Button onClick={nextStep}>{t('initlal.button.next')}</Button>
                     </Group>
                 </Stepper.Step>
+
                 <Stepper.Step label={t('initlal.title.2')} description={t('initlal.description.2')}>
+                    <TextInput
+                        label={t('initlal.url.title')}
+                        description={t('initlal.url.description')}
+                        placeholder="your.domain.com"
+                        value={url}
+                        error={url.endsWith('bsky.social') ? t('initlal.url.error.bskydomain') : null}
+                        onChange={(event) => setUrl(event.currentTarget.value)}
+                    />
+                    <Stack align="flex-start" mt="md" >
+                        <Center style={{ width: '100%' }}>
+                            <Button fullWidth={false} onClick={nextStep} disabled={url.length < 5}>{t('initlal.button.next')}</Button>
+                        </Center>
+                    </Stack>
+                </Stepper.Step>
+                <Stepper.Step label={t('initlal.title.3')} description={t('initlal.description.3')}>
                     {!secKey &&
                         <Stack align="flex-start">
                             <Center style={{ width: '100%' }}>
@@ -229,21 +263,6 @@ export default function Inital({ userProf }: InitalProps) {
                             </Center>
                         </Stack>
                     )}
-                </Stepper.Step>
-                <Stepper.Step label={t('initlal.title.3')} description={t('initlal.description.3')}>
-                    <TextInput
-                        label={t('initlal.url.title')}
-                        description={t('initlal.url.description')}
-                        placeholder="your.domain.com"
-                        value={url}
-                        error={url.endsWith('bsky.social') ? t('initlal.url.error.bskydomain') : null}
-                        onChange={(event) => setUrl(event.currentTarget.value)}
-                    />
-                    <Stack align="flex-start" mt="md" >
-                        <Center style={{ width: '100%' }}>
-                            <Button fullWidth={false} onClick={nextStep} disabled={url.length < 5}>{t('initlal.button.next')}</Button>
-                        </Center>
-                    </Stack>
                 </Stepper.Step>
                 <Stepper.Step label={t('initlal.title.4')} description={t('initlal.description.4')}>
                     {!finalConfirm && <>
