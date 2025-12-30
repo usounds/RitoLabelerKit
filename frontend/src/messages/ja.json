@@ -103,13 +103,17 @@
                 },
                 "field": {
                     "key": {
-                        "title": "並び順",
-                        "description": "後から変更できません",
-                        "placeholder": "001"
+                        "title": "英語名",
+                        "description": "一部のクライアントで表示されます。後から変更できません",
+                        "placeholder": "birthday",
+                        "required": "英語名は必須です",
+                        "noNumbersOnly": "数字のみは不可です",
+                        "noSpaces": "スペースは不可です",
+                        "noFullWidth": "全角文字は不可です"
                     },
                     "title": {
                         "title": "タイトル",
-                        "description": "ラベルの名前",
+                        "description": "ラベルの名前で、多くのクライアントではこちらが表示されます。",
                         "placeholder": "誕生日",
                         "required": "タイトルは必須です"
                     },

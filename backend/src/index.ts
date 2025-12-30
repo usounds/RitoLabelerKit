@@ -157,7 +157,7 @@ function handleLikeEvent(rkey: string, record: { subject: string; createdAt: str
     // DBに保存
     upsertLike(rkey, record.subject, record.createdAt);
 
-    logger.info(`Upsert Like def. ${rkey}`)
+    logger.info(`Upsert Like definition. ${rkey}`)
 
     // オンメモリに反映
     const idx = memoryDB.likes.findIndex(l => l.rkey === rkey);
@@ -199,7 +199,7 @@ jetstream.onDelete('blue.rito.label.auto.like', (event: CommitDeleteEvent<'blue.
 
     if (process.env.LABELER_DID === event.did) {
         queue.add(async () => {
-            logger.info(`Delete Like def. ${event.commit.rkey}`)
+            logger.info(`Delete Like definition. ${event.commit.rkey}`)
             deleteLike(event.commit.rkey);
         });
     }
@@ -217,7 +217,7 @@ function handlePostEvent(rkey: string, data: {
 }) {
     // DB に保存
     upsertPost(rkey, data);
-    logger.info(`Upsert Post def. ${rkey}`);
+    logger.info(`Upsert Post definition. ${rkey}`);
 
     // オンメモリに反映
     const idx = memoryDB.posts.findIndex(p => p.rkey === rkey);
@@ -253,7 +253,6 @@ function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.p
                 durationInHours: number;
                 createdAt: string;
             };
-            logger.info(record)
             handlePostEvent(event.commit.rkey, record);
         });
     }
@@ -269,7 +268,7 @@ jetstream.onDelete('blue.rito.label.auto.post', (event: CommitDeleteEvent<'blue.
     // 自分が作成したラベルのみ処理
     if (process.env.LABELER_DID === event.did) {
         queue.add(async () => {
-            logger.info(`Delete Post def. ${event.commit.rkey}`);
+            logger.info(`Delete Post definition. ${event.commit.rkey}`);
 
             // DB から削除
             deletePost(event.commit.rkey);
@@ -301,7 +300,6 @@ jetstream.onCreate('app.bsky.feed.post', (event: CommitCreateEvent<'app.bsky.fee
                         await applyLabelForUser(event.did, [postRule.label], postRule.action, postRule.durationInHours)
                     } else if (postRule.appliedTo === 'post') {
                         const aturi = `at://${event.did}/app.bsky.feed.post/${event.commit.rkey}`
-                        logger.info(`${aturi}`);
                         await applyLabelForPost(aturi, event.commit.cid, [postRule.label], 'add', postRule.durationInHours)
                     }
 

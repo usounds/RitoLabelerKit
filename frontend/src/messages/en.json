@@ -1,5 +1,5 @@
 {
-    "title": "Bluesky Tiny laberer by Rito",
+    "title": "リトラベラーキット",
     "description": "Blueskyのラベラーを支援するツールキット",
     "top": {
         "welcome": "Quick launch your Bluesky Labeler",
@@ -58,12 +58,12 @@
                 "apply": "ラベラーアカウントに変更する",
                 "logout": "ログアウト"
             },
-            "user": "{user}でログインしました",
-            "posted": "あなたはすでに投稿を行っています。ラベラーは専用の新規のアカウントで行うことを推奨します。",
+            "user": "@{user}でログインしました",
+            "posted": "あなたはすでに投稿を行っています。ラベラーは専用の新規のアカウントで行うことを推奨します。別のアカウントで進める場合はログアウトしてください。",
             "seckey": "秘密鍵を生成します。ブラウザで処理され、本サービスの開発者に送信されることはありません。",
             "seckeyAreSensitive": "秘密鍵はRailway以外に入力してはなりません。",
             "plcToken": "メールによる認証が必要です。",
-            "complete": "おめでとうございます！一度本サイトからログアウトして、Railwayでラベラーのサーバーを立ち上げてください。",
+            "complete": "おめでとうございます！一度ログアウトして、ダウンロードした秘密鍵などをRailwayに反映してください。",
             "url": {
                 "title": "Railway URL",
                 "description": "Railwayで使用する予定のURLを入力してください。",
@@ -103,13 +103,17 @@
                 },
                 "field": {
                     "key": {
-                        "title": "並び順",
-                        "description": "後から変更できません",
-                        "placeholder": "001"
+                        "title": "英語名",
+                        "description": "一部のクライアントで表示されます。後から変更できません",
+                        "placeholder": "birthday",
+                        "required": "英語名は必須です",
+                        "noNumbersOnly": "数字のみは不可です",
+                        "noSpaces": "スペースは不可です",
+                        "noFullWidth": "全角文字は不可です"
                     },
                     "title": {
                         "title": "タイトル",
-                        "description": "ラベルの名前",
+                        "description": "ラベルの名前で、多くのクライアントではこちらが表示されます。",
                         "placeholder": "誕生日",
                         "required": "タイトルは必須です"
                     },
@@ -136,7 +140,8 @@
                 },
                 "button": {
                     "save": "保存",
-                    "delete": "無効化"
+                    "delete": "無効化",
+                    "view": "投稿を参照"
                 }
             },
             "post": {

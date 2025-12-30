@@ -1,19 +1,21 @@
 "use client"
 import Ininital from '@/components/Ininital';
 import Manage from '@/components/Manage';
+import { didDocumentResolver, isPlcOrWebDid } from '@/lib/HandleAgent';
+import { useManageStore } from "@/lib/ManageStore";
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { isDid, } from '@atcute/lexicons/syntax';
 import { Container, Group, Loader, Text } from '@mantine/core';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { didDocumentResolver, isPlcOrWebDid } from '@/lib/HandleAgent';
 
 export default function Console() {
     const [mode, setMode] = useState<'loading' | 'initial' | 'manage'>('loading');
     const t = useTranslations('console');
     const router = useRouter();
     const locale = useLocale();
+    const setLabelerVersion = useManageStore(state => state.setLabelerVersion);
     const userProf = useXrpcAgentStore(state => state.userProf);
     const thisClient = useXrpcAgentStore(state => state.thisClient);
 
@@ -53,6 +55,15 @@ export default function Console() {
 
             if (method && service) {
                 setMode('manage');
+                try {
+                    const result = await fetch(`${service.serviceEndpoint}/xrpc/_health`)
+                    const body = await result.json() as { version: string }
+                    if (body.version) {
+                        setLabelerVersion(body.version)
+                    }
+                } catch {
+
+                }
             } else {
                 setMode('initial');
             }

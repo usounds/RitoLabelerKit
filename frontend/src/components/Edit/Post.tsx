@@ -43,6 +43,7 @@ export default function PostForm({
   const labelerDef = useManageStore(state => state.labelerDef);
   const post = useManageStore(state => state.post);
   const setPost = useManageStore(state => state.setPost);
+  const labelerVersion = useManageStore(state => state.labelerVersion);
   const [isLoading, setIsLoading] = useState(false);
 
   const labelOptions = (labelerDef?.policies?.labelValueDefinitions ?? []).map(
@@ -66,7 +67,15 @@ export default function PostForm({
     },
     validate: {
       label: (v) => (!v ? 'Required' : null),
-      condition: (v) => (!v ? 'Required' : null),
+      condition: (v) => {
+        if (!v) return 'Required';
+        try {
+          new RegExp(v);
+          return null; // 正しい正規表現
+        } catch  {
+          return 'Invalid regular expression';
+        }
+      },
       durationInHours: (v) =>
         v === null || v === undefined ? 'Required' : null,
     },
@@ -234,7 +243,7 @@ export default function PostForm({
           </>
         }
 
-        {form.values.action === 'add' &&
+        {(form.values.action === 'add' && labelerVersion.startsWith('0.1.')) &&
           <>
             {/* 有効期限 */}
             <NumberInput

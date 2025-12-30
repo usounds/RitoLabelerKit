@@ -60,7 +60,6 @@ export function TableScrollArea() {
     const rows =
         labelerDef?.policies.labelValueDefinitions
             ?.slice() // 元配列を破壊しない
-            .sort((a, b) => a.identifier.localeCompare(b.identifier)) // アルファベット順ソート
             .map((def) => {
                 const text = pickLocaleText(def.locales, locale);
 
@@ -71,7 +70,7 @@ export function TableScrollArea() {
                                 }}>
                         <Table.Td>{def.identifier}</Table.Td>
                         <Table.Td>{text?.name}</Table.Td>
-                        <Table.Td>{text?.description?.slice(0,50) ?? '—'}</Table.Td>
+                        <Table.Td>{text?.description?.slice(0,30) ?? '—'}</Table.Td>
                     </Table.Tr>
                 );
             }) ?? [];

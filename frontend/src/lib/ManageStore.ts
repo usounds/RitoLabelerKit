@@ -16,12 +16,14 @@ type ManageStore = {
   like: BlueRitoLabelAutoLikeWithRkey[]
   post: BlueRitoLabelAutoPostWithRkey[]
   useLike: boolean
+  labelerVersion: string
 
   setLabelerDef: (v: AppBskyLabelerService.Main | null) => void
   setLikeSettings: (v: BlueRitoLabelAutoLikeSettings.Main | null) => void
   setLike: (v: BlueRitoLabelAutoLikeWithRkey[]) => void
   setPost: (v: BlueRitoLabelAutoPostWithRkey[]) => void
   setUseLike: (v: boolean) => void
+  setLabelerVersion: (v: string) => void
 }
 
 export const useManageStore = create<ManageStore>((set) => ({
@@ -30,10 +32,12 @@ export const useManageStore = create<ManageStore>((set) => ({
   like: [],
   post: [],
   useLike: false,
+  labelerVersion:'',
 
   setLabelerDef: (labelerDef) => set({ labelerDef }),
   setLikeSettings: (likeSettings) => set({ likeSettings }),
   setLike: (like) => set({ like }),
   setUseLike: (useLike) => set({ useLike }),
   setPost: (post) => set({ post }),
+  setLabelerVersion: (labelerVersion) => set({ labelerVersion }),
 }))

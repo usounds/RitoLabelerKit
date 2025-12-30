@@ -55,7 +55,7 @@ const buildNextLabelerDef = (
         blurs: 'none',
         severity: 'inform',
         defaultSetting: "warn",
-        adultOnly:false,
+        adultOnly: false,
         locales,
     };
 
@@ -313,87 +313,36 @@ export default function Edit({
     };
 
 
-    // labelValues をそのまま文字列として昇順ソート
-    const existing = (labelerDef?.policies.labelValues ?? [])
-        .filter((v) => !isNaN(Number(v)))
-        .map((v) => Number(v));
-
-    const maxVal = existing.length > 0 ? Math.max(...existing) : 0;
-    const allKeysStr: string[] = [];
-
-    // 0から最大値までの番号を3桁ゼロ埋めで追加
-    for (let i = 0; i <= maxVal + 1; i++) {
-        if (!existing.includes(i)) {
-            allKeysStr.push(i.toString().padStart(3, '0'));
-        }
-    }
-
-    // 最小の空き番号を初期値に
-    const initialKey2 = (keyLocal && keyLocal.trim() !== '')
-        ? keyLocal
-        : allKeysStr[0] ?? '000';
-
     // フォーム初期化
     const form = useForm({
         initialValues: {
-            key: initialKey2 || '000',
+            key: keyLocal || '',
             name: current?.name ?? '',
             description: current?.description ?? '',
         },
         validate: {
-            key: (v) => (!v ? t('field.key.required') : null),
+            key: (v) => {
+                if (!v) return t('field.key.required');
+                if (/^\d+$/.test(v)) return t('field.key.noNumbersOnly'); // 数字だけ
+                if (/\s/.test(v)) return t('field.key.noSpaces');          // 空白含む
+                if (/[^\x00-\x7F]/.test(v)) return t('field.key.noFullWidth'); // 全角含む
+                return null;
+            },
             name: (v) => (!v ? t('field.title.required') : null),
             description: (v) => (!v ? t('field.description.required') : null),
-        },
+        }
     });
-
-    const allKeys: number[] = (labelerDef?.policies.labelValues ?? [])
-        .map((v) => Number(v))
-        .filter((v): v is number => !Number.isNaN(v))
-        .sort((a, b) => a - b);
-
-    // 増減
-    const incrementKey = () => {
-        const currentNum = Number(form.values.key);
-        if (Number.isNaN(currentNum)) return;
-
-        let next = currentNum + 1;
-        while (allKeys.includes(next)) {
-            next += 1; // 既存の番号はスキップ
-        }
-        form.setFieldValue('key', next.toString().padStart(3, '0')); // 3桁ゼロ埋め
-    };
-
-    const decrementKey = () => {
-        const currentNum = Number(form.values.key);
-        if (Number.isNaN(currentNum) || currentNum <= 1) return;
-
-        let prev = currentNum - 1;
-        while (allKeys.includes(prev) && prev > 1) {
-            prev -= 1;
-        }
-
-        if (prev < 1) return;
-
-        form.setFieldValue('key', prev.toString().padStart(3, '0'));
-    };
-
-
 
     return (
         <Stack>
-            <Group align="flex-end">
-                <TextInput
-                    label={t('field.key.title')}
-                    description={t('field.key.description')}
-                    placeholder={t('field.key.placeholder')}
-                    {...form.getInputProps('key')}
-                    maxLength={15}
-                    disabled={!!keyLocal}
-                />
-                <Button onClick={incrementKey} disabled={!!keyLocal}>↑</Button>
-                <Button onClick={decrementKey} disabled={!!keyLocal}>↓</Button>
-            </Group>
+            <TextInput
+                label={t('field.key.title')}
+                description={t('field.key.description')}
+                placeholder={t('field.key.placeholder')}
+                {...form.getInputProps('key')}
+                maxLength={15}
+                disabled={!!keyLocal}
+            />
 
             <TextInput
                 label={t('field.title.title')}

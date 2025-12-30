@@ -12,7 +12,8 @@ import {
     Group,
     Modal,
     Switch,
-    Text
+    Text,
+
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -184,7 +185,7 @@ export function Login() {
                         mt="md"
                         required />
                     <Group justify="space-between" mt="lg" className={classes.controls}>
-                        {!needPlcOpe &&
+                        {needPlcOpe &&
                             <>
                                 <Alert variant="light" color="red" title="Alert">
                                     {t('message.plcOpe')}
@@ -194,6 +195,8 @@ export function Login() {
                                     onChange={(event) => setAcceptPlcOpe(event.currentTarget.checked)}
                                 />
                             </>}
+                    </Group>
+                    <Group justify={'flex-end'}>
                         <Button loading={isLoading} disabled={isLoading} className={classes.control} onClick={handleLogin}>{t('button.login')}</Button>
                     </Group>
                 </Container>

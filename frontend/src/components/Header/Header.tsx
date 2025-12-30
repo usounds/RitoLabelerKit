@@ -5,8 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import classes from './Header.module.css';
 
 const links = [
-  { href: '/about', label: 'Features' },
-  { href: '/admin', label: 'Admin' },
+  { href: '/about', label: 'About' },
 ];
 
 export default function Header() {
@@ -33,7 +32,7 @@ export default function Header() {
             hiddenFrom="sm"
           />
           <Link href="/" className={classes.link}>
-            Rito Label
+            Rito Labeler Console
           </Link>
         </Group>
 

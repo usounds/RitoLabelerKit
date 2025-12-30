@@ -2,7 +2,6 @@
 import { TableScrollArea } from "@/components/LabelTable/Table";
 import Like from "@/components/Tab/Like";
 import Post from "@/components/Tab/Post";
-import { ActorIdentifier } from '@atcute/lexicons';
 import { BlueRitoLabelAutoLike, BlueRitoLabelAutoPost, BlueRitoLabelAutoLikeSettings } from '@/lexicons/index';
 import { isPlcOrWebDid } from '@/lib/HandleAgent';
 import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManageStore } from "@/lib/ManageStore";
@@ -116,8 +115,6 @@ export default function Manage() {
                 },
                 as: 'json' // 型によっては必須
             });
-
-
             if (getRecord.ok) {
                 setLabelerDef(getRecord.data.value as AppBskyLabelerService.Main);
             }
@@ -140,8 +137,7 @@ export default function Manage() {
 
             const like = await fetchAllPosts()
             setPost(like);
-            console.log(like)
-
+            
         }
 
         handleOnLoad()
@@ -200,7 +196,7 @@ export default function Manage() {
                 <Group
                     align="center"        // 垂直方向の中央揃え
                     style={{ justifyContent: 'center' }} // 横方向の中央揃え
-                    mt="md"
+                    mt="sm"
                 >
                     <Button onClick={logout} variant="light" color="red" disabled={isLoading} loading={isLoading}>{t('button.logout')}</Button>
                 </Group>
