@@ -4,9 +4,9 @@ import path from 'node:path';
 
 // 環境変数から DB パスを取得。なければデフォルト
 const dbPath = process.env.DB_PATH
-  ? path.join(process.cwd(), process.env.DB_PATH, 'labeling.db')   // カレントディレクトリ基準
-  : 'data/labeling.db';
-
+  ? path.join(process.env.DB_PATH, 'labeling.db') // DB_PATH がある場合
+  : path.join(process.cwd(), 'data', 'labeling.db'); // ない場合はカレントディレクトリ/data/skyware.db
+  
 // SQLite DB インスタンスを作成
 export const db = new Database(dbPath);
 console.log(`Database initialized at: ${dbPath}`);

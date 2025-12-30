@@ -14,9 +14,8 @@ const queue = new PQueue({ concurrency: 1 });
 const port = process.env.SKYWARE_PORT ? parseInt(process.env.SKYWARE_PORT) : 8080;
 
 const dbPath = process.env.DB_PATH
-    ? path.join(process.cwd(), process.env.DB_PATH, 'skyware.db')   // カレントディレクトリ基準
-    : 'data/skyware.db';
-
+  ? path.join(process.env.DB_PATH, 'skyware.db') // DB_PATH がある場合
+  : path.join(process.cwd(), 'data', 'skyware.db'); // ない場合はカレントディレクトリ/data/skyware.db
 
 if (process.env.LABELER_DID === 'DUMMY') {
     logger.info(`This service need to more setup. Please go to the following site.`)
