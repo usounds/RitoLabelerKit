@@ -1,7 +1,16 @@
 :8080 {
+    # WebSocket / HTTP API を LabelerServer に転送
     reverse_proxy labeler.railway.internal:8080 {
         transport http {
             versions 1.1
+        }
+    }
+
+    # 固定ヘルスチェック
+    handle_path /xrpc/_health {
+        respond "{ \"status\": \"ok\", \"version\": \"0.2.0\" }" 200 {
+            close
+            content_type application/json
         }
     }
 }
