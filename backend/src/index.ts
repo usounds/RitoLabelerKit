@@ -1,5 +1,4 @@
 import { CommitCreateEvent, CommitDeleteEvent, CommitUpdateEvent, Jetstream } from '@skyware/jetstream';
-import { LabelerServer } from "@skyware/labeler";
 import 'dotenv/config';
 import path from 'node:path';
 import PQueue from 'p-queue';
@@ -18,13 +17,6 @@ const app = express();
 app.get('/', (req, res) => res.send('OK'));
 app.listen(port, () => console.log(`Health check listening on port ${port}`));
 
-
-const skywarePort = parseInt(process.env.SKYWARE__PORT || '8070');
-
-const dbPath = process.env.DB_PATH
-    ? path.join(process.env.DB_PATH, 'skyware.db') // DB_PATH がある場合
-    : path.join(process.cwd(), 'data', 'skyware.db'); // ない場合はカレントディレクトリ/data/skyware.db
-
 if (process.env.LABELER_DID === 'DUMMY') {
     logger.info(`This service need to more setup. Please go to the following site.`)
     logger.info(`https://label.rito.blue`)
@@ -33,22 +25,6 @@ if (process.env.LABELER_DID === 'DUMMY') {
         logger.info(process.env.RAILWAY_PUBLIC_DOMAIN)
     }
 }
-
-const server = new LabelerServer({
-    did: process.env.LABELER_DID || '',
-    signingKey: process.env.LABELER_SIGNED_SEC_KEY || '',
-    dbPath: dbPath
-});
-server.start(
-    { port:skywarePort, host: '0.0.0.0' }, // ← FastifyListenOptions
-    (error, address) => {
-        if (error) {
-            console.error("Failed to start server:", error);
-        } else {
-            console.log(`Labeler server running at ${address}`);
-        }
-    }
-);
 
 let cursor = 0;
 let prev_time_us = 0
