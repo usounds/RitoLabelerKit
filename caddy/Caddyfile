@@ -4,7 +4,7 @@
         respond "" 200
     }
     # WebSocket / HTTP API を LabelerServer に転送
-    reverse_proxy skyware.railway.internal:8080 {
+    reverse_proxy skyware-backend.railway.internal:8080 {
         transport http {
             versions 1.1
         }
