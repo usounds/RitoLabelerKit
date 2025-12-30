@@ -13,6 +13,14 @@ const queue = new PQueue({ concurrency: 1 });
 
 const port = parseInt(process.env.PORT || '8080');
 
+import express from 'express';
+const app = express();
+app.get('/', (req, res) => res.send('OK'));
+app.listen(port, () => console.log(`Health check listening on port ${port}`));
+
+
+const skywarePort = parseInt(process.env.SKYWARE__PORT || '8070');
+
 const dbPath = process.env.DB_PATH
     ? path.join(process.env.DB_PATH, 'skyware.db') // DB_PATH がある場合
     : path.join(process.cwd(), 'data', 'skyware.db'); // ない場合はカレントディレクトリ/data/skyware.db
@@ -32,7 +40,7 @@ const server = new LabelerServer({
     dbPath: dbPath
 });
 server.start(
-    { port, host: '0.0.0.0' }, // ← FastifyListenOptions
+    { port:skywarePort, host: '0.0.0.0' }, // ← FastifyListenOptions
     (error, address) => {
         if (error) {
             console.error("Failed to start server:", error);

@@ -17,6 +17,7 @@
 		"@skyware/labeler": "0.2.0",
 		"better-sqlite3": "^12.5.0",
 		"dotenv": "^17.2.3",
+		"express": "^5.2.1",
 		"fastify": "^5.6.2",
 		"p-queue": "^9.0.1",
 		"pino": "^10.1.0",
@@ -27,6 +28,7 @@
 	"devDependencies": {
 		"@atcute/lex-cli": "^2.5.2",
 		"@types/better-sqlite3": "^7.6.13",
+		"@types/express": "^5.0.6",
 		"@types/node": "^25.0.3",
 		"@types/ws": "^8.18.1"
 	}
