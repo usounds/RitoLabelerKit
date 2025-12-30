@@ -315,14 +315,13 @@ jetstream.onCreate('app.bsky.feed.post', (event: CommitCreateEvent<'app.bsky.fee
 
 jetstream.on('close', () => {
     clearInterval(cursorUpdateInterval);
-    logger.warn(`Jetstream connection closed.`);
-    process.exit(1);
+    logger.warn(`Jetstream connection closed. Attempting to reconnect...`);
+    setTimeout(() => jetstream.start(), 5000); // 5秒後に再接続
 });
 
 jetstream.on('error', (error) => {
     logger.error(`Jetstream error: ${error.message}`);
     jetstream.close();
-    process.exit(1);
 });
 
 jetstream.start();
