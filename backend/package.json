@@ -1,13 +1,13 @@
 {
-	"name": "rito-labeler-kit",
-	"version": "0.0.1",
+	"name": "rito-auto-labeling-service",
+	"version": "0.1.0",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
 		"dev": "pnpm dlx tsx src/index.ts",
 		"build": "tsc",
 		"start": "node dist/index.js",
-		"lex-gen": "pnpm dlx lex-cli generate -c ./lex.config.mjs"
+		"lex-gen": "npx ßlex-cli generate -c ./lex.config.mjs"
 	},
 	"dependencies": {
 		"@atcute/client": "^4.1.2",
