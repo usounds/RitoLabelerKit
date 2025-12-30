@@ -22,8 +22,6 @@ if (process.env.LABELER_DID === 'DUMMY') {
     }
 }
 
-if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
-    console.log('ここにいる')
     const server = new LabelerServer({
         did: process.env.LABELER_DID || '',
         signingKey: process.env.LABELER_SIGNED_SEC_KEY || '',
@@ -335,4 +333,3 @@ if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
     });
 
     jetstream.start();
-}
