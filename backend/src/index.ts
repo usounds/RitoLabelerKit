@@ -159,13 +159,21 @@ function startJetstream() {
     logger.info('Starting Jetstream...');
 
     // 起動時に呼び出し
-    loadMemoryDB();
-
-
     try {
-        cursor = getCursor(); // DB から取得
-    } catch (error) {
-        cursor = Math.floor(Date.now() * 1000); // DB 取得失敗時は現在時刻
+        loadMemoryDB();
+
+        try {
+            cursor = getCursor();
+        } catch {
+            cursor = Math.floor(Date.now() * 1000);
+        }
+
+        logger.info(`Cursor from: ${cursor} (${epochUsToDateTime(cursor)})`);
+    } catch (err) {
+        connecting = false;
+        logger.error(err, 'Startup preparation failed');
+        scheduleReconnect();
+        return;
     }
 
     logger.info(`Cursor from: ${cursor} (${epochUsToDateTime(cursor)})`)
@@ -180,7 +188,14 @@ function startJetstream() {
     const intervalMs = Number(process.env.CURSOR_UPDATE_INTERVAL) || 10000;
 
 
-    jetstream.start();
+    try {
+        jetstream.start();
+    } catch (err) {
+        connecting = false;
+        logger.error(err, 'Jetstream.start() threw');
+        scheduleReconnect();
+        return;
+    }
 
 
     // Create / Update 共通化
@@ -409,9 +424,19 @@ setTimeout(() => {
 }, 30_000);
 
 process.on('uncaughtException', err => {
-  logger.fatal(err, 'uncaughtException');
+    logger.fatal(err, 'uncaughtException');
 });
 
 process.on('unhandledRejection', err => {
-  logger.fatal(err, 'unhandledRejection');
+    logger.fatal(err, 'unhandledRejection');
+});
+
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT received, shutting down gracefully...');
+  process.exit(0);
 });
