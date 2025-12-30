@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 // 環境変数から DB パスを取得。なければデフォルト
-const dbPath =  process.env.DB_PATH+'label.db' || '/data/label.db'
+const dbPath = process.env.DB_PATH ? process.env.DB_PATH + 'skyware.db' : '/data/labeling.db'
 
 // DB ディレクトリが存在しなければ作る
 const dbDir = path.dirname(dbPath);

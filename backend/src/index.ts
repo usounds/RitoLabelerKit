@@ -11,7 +11,7 @@ const queue = new PQueue({ concurrency: 1 });
 
 import { LabelerServer } from "@skyware/labeler";
 
-const port = process.env.PORT ? parseInt(process.env.PORT) : 14831;
+const port = process.env.SKYWARE_PORT ? parseInt(process.env.SKYWARE_PORT) : 8080;
 
 if (process.env.LABELER_DID === 'DUMMY') {
     logger.info(`This service need to more setup. Please go to the following site.`)
@@ -27,7 +27,7 @@ if (process.env.LABELER_DID && process.env.LABELER_DID !== 'DUMMY') {
     const server = new LabelerServer({
         did: process.env.LABELER_DID || '',
         signingKey: process.env.LABELER_SIGNED_SEC_KEY || '',
-        dbPath: process.env.DB_PATH+'skyware.db' || '/data/skyware.db'
+        dbPath: process.env.DB_PATH ? process.env.DB_PATH + 'skyware.db' : '/data/skyware.db'
     });
     server.start(
         { port, host: '0.0.0.0' }, // ← FastifyListenOptions
