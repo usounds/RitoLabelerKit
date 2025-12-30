@@ -7,7 +7,7 @@
     }
 
     # 固定ヘルスチェック
-    handle_path /xrpc/_health {
+    handle_path /_health {
         respond "{ \"status\": \"ok\", \"version\": \"0.2.0\" }" 200 {
             close
             content_type application/json
