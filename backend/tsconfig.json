@@ -7,6 +7,8 @@
     "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "outDir": "dist",
+    "rootDir": "src",
     "baseUrl": "src",
     "types": ["node"],
     "paths": {
