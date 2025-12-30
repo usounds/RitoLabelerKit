@@ -1,37 +1,25 @@
-# ---------- base ----------
-FROM node:20-slim AS base
+FROM node:22-slim
+
 WORKDIR /app
-RUN corepack enable
 
-# ---------- deps ----------
-FROM base AS deps
-
-# ★ native addon 用ツール
+# ネイティブ依存がある可能性に備える（better-sqlite3 等）
 RUN apt-get update && apt-get install -y \
   python3 \
   make \
   g++ \
+  libsqlite3-dev \
   && rm -rf /var/lib/apt/lists/*
 
-COPY package.json pnpm-lock.yaml ./
+# 依存関係
+COPY package.json package-lock.json ./
+RUN npm install --no-audit --no-fund
 
-# ★ postinstall をちゃんと走らせる
-RUN pnpm install --frozen-lockfile \
- && pnpm approve-builds esbuild better-sqlite3
-
-# ---------- build ----------
-FROM deps AS build
+# ソース
 COPY . .
-RUN pnpm build
 
-# ---------- runtime ----------
-FROM node:20-slim AS runtime
-WORKDIR /app
-ENV NODE_ENV=production
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY package.json ./
+# TypeScript build
+RUN npm run build
 
 EXPOSE 8080
-CMD ["node", "dist/index.js"]
+
+CMD ["npm", "run", "start"]

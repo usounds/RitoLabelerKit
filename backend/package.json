@@ -3,7 +3,6 @@
 	"version": "0.0.1",
 	"main": "src/index.ts",
 	"type": "module",
-	"packageManager": "pnpm@10.25.0",
 	"scripts": {
 		"dev": "pnpm dlx tsx src/index.ts",
 		"build": "tsc",
