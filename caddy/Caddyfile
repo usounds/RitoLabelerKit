@@ -1,7 +1,7 @@
 :8080 {
     reverse_proxy labeler.railway.internal:8080 {
         transport http {
-            versions 1.1
+            versions h1
         }
     }
 }
