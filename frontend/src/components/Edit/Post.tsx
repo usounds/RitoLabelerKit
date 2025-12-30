@@ -217,14 +217,6 @@ export default function PostForm({
           {...form.getInputProps('condition')}
         />
 
-        {/* 有効期限 */}
-        <NumberInput
-          label={t('field.durationInHours.title')}
-          description={t('field.durationInHours.description')}
-          min={0}
-          clampBehavior="strict"
-          {...form.getInputProps('durationInHours')}
-        />
 
         {form.values.appliedTo === 'account' &&
           <>
@@ -239,6 +231,19 @@ export default function PostForm({
                 <Radio value="remove" label={t('field.action.remove')} />
               </Group>
             </Radio.Group>
+          </>
+        }
+
+        {form.values.action === 'add' &&
+          <>
+            {/* 有効期限 */}
+            <NumberInput
+              label={t('field.durationInHours.title')}
+              description={t('field.durationInHours.description')}
+              min={0}
+              clampBehavior="strict"
+              {...form.getInputProps('durationInHours')}
+            />
           </>
         }
 

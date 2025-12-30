@@ -1,5 +1,5 @@
 {
-    "title": "Bluesky Tiny laberer by Rito",
+    "title": "リトラベラーキット",
     "description": "Blueskyのラベラーを支援するツールキット",
     "top": {
         "welcome": "Quick launch your Bluesky Labeler",
@@ -59,11 +59,11 @@
                 "logout": "ログアウト"
             },
             "user": "@{user}でログインしました",
-            "posted": "あなたはすでに投稿を行っています。ラベラーは専用の新規のアカウントで行うことを推奨します。",
+            "posted": "あなたはすでに投稿を行っています。ラベラーは専用の新規のアカウントで行うことを推奨します。別のアカウントで進める場合はログアウトしてください。",
             "seckey": "秘密鍵を生成します。ブラウザで処理され、本サービスの開発者に送信されることはありません。",
             "seckeyAreSensitive": "秘密鍵はRailway以外に入力してはなりません。",
             "plcToken": "メールによる認証が必要です。",
-            "complete": "おめでとうございます！一度本サイトからログアウトして、Railwayでラベラーのサーバーを立ち上げてください。",
+            "complete": "おめでとうございます！一度ログアウトして、ダウンロードした秘密鍵などをRailwayに反映してください。",
             "url": {
                 "title": "Railway URL",
                 "description": "Railwayで使用する予定のURLを入力してください。",
@@ -136,7 +136,8 @@
                 },
                 "button": {
                     "save": "保存",
-                    "delete": "無効化"
+                    "delete": "無効化",
+                    "view": "投稿を参照"
                 }
             },
             "post": {

@@ -4,13 +4,14 @@ import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import UserButton from "@/components/User/UserButton";
 import { AppBskyActorDefs } from '@atcute/bluesky';
 import { Client } from '@atcute/client';
+import { useRouter } from 'next/navigation';
 import { Alert, Button, Center, Group, Stack, Stepper, Text, Textarea, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import bs58 from 'bs58';
 import { ec as EC } from 'elliptic';
 import { MessageCircleWarning } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
 const ec = new EC('secp256k1');
 
@@ -29,6 +30,8 @@ export default function Inital({ userProf }: InitalProps) {
     const thisClient = useXrpcAgentStore(state => state.thisClient);
     const setUserProf = useXrpcAgentStore(state => state.setUserProf);
     const setActiveDid = useXrpcAgentStore(state => state.setActiveDid);
+    const router = useRouter();
+    const locale = useLocale();
     const t = useTranslations('console');
     const [active, setActive] = useState(0);
     const [secKey, setSetSecKey] = useState("");
@@ -182,8 +185,22 @@ export default function Inital({ userProf }: InitalProps) {
         setUserProf(null)
         setActiveDid(null)
 
-        window.location.href = "https://railway.app/new/template/your-template-id";
+
+        router.replace(`/${locale}/`);
         setIsLoading(false)
+    }
+
+    function urlPerse() {
+        try {
+            // URLをパースしてホストだけ取り出す
+            const parsed = new URL(url);
+            setUrl(parsed.host); // host 部分だけセット
+        } catch (e) {
+            // URLが不正な場合はそのままにするか、エラー処理
+            console.error('Invalid URL', e);
+        }
+
+        nextStep()
     }
 
 
@@ -201,14 +218,19 @@ export default function Inital({ userProf }: InitalProps) {
                         <UserButton userProf={userProf} />
 
                         {(userProf?.postsCount || 0) > 0 && (
-                            <Alert
-                                variant="light"
-                                color="red"
-                                icon={<MessageCircleWarning />}
-                                style={{ width: '100%' }}
-                            >
-                                {t('initlal.posted')}
-                            </Alert>
+                            <>
+                                <Alert
+                                    variant="light"
+                                    color="red"
+                                    icon={<MessageCircleWarning />}
+                                    style={{ width: '100%' }}
+                                >
+                                    {t('initlal.posted')}
+                                </Alert>
+                                <Center>
+                                    <Button fullWidth={false} onClick={logout} disabled={isLoading}>{t('initlal.button.logout')}</Button>
+                                </Center>
+                            </>
                         )}
                     </Stack>
 
@@ -229,7 +251,7 @@ export default function Inital({ userProf }: InitalProps) {
                     />
                     <Stack align="flex-start" mt="md" >
                         <Center style={{ width: '100%' }}>
-                            <Button fullWidth={false} onClick={nextStep} disabled={url.length < 5}>{t('initlal.button.next')}</Button>
+                            <Button fullWidth={false} onClick={urlPerse} disabled={url.length < 5}>{t('initlal.button.next')}</Button>
                         </Center>
                     </Stack>
                 </Stepper.Step>

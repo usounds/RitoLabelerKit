@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@atcute/client": "^4.1.2",
+		"@atcute/lexicons": "^1.2.6",
 		"@atcute/ozone": "^3.1.13",
 		"@fastify/websocket": "^11.2.0",
 		"@skyware/jetstream": "^0.2.5",

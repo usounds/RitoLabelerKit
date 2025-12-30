@@ -1,13 +1,13 @@
 
-import { useLocale, useTranslations } from 'next-intl';
-import { useState, useMemo } from 'react';
-import { Plus } from 'lucide-react';
-import cx from 'clsx';
-import { useDisclosure } from '@mantine/hooks';
-import { Modal, Center, ScrollArea, Table, Button } from '@mantine/core';
 import PostForm from '@/components/Edit/Post';
+import { BlueRitoLabelAutoPostWithRkey, useManageStore } from "@/lib/ManageStore";
+import { Button, Center, Modal, ScrollArea, Table } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import cx from 'clsx';
+import { Plus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
 import classes from './Post.module.css';
-import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManageStore } from "@/lib/ManageStore";
 
 export default function Post() {
     const t = useTranslations('console.manage.post');
@@ -49,7 +49,6 @@ export default function Post() {
                 </Modal>
                 <Button
                     leftSection={<Plus />}
-                    size='xs'
                     onClick={() => {
                         setEditingKey(undefined);
                         open();

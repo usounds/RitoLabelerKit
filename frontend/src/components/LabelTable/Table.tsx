@@ -98,7 +98,6 @@ export function TableScrollArea() {
 
                     <Button
                         leftSection={<Plus />}
-                        size='xs'
                         onClick={() => {
                             setEditingKey(undefined);
                             open();

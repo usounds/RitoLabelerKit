@@ -4,7 +4,7 @@ import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { AppBskyLabelerService, } from '@atcute/bluesky';
 import { ActorIdentifier } from '@atcute/lexicons/syntax';
 import * as TID from '@atcute/tid';
-import { Alert, Button, Group, Stack, Switch, Textarea } from '@mantine/core';
+import { Alert, Button, Center, Group, Stack, Switch, Textarea } from '@mantine/core';
 import { MessageCircleWarning, Save } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -56,6 +56,7 @@ export default function Like() {
         if (!likeSettings?.apply) {
             const rootpost = []
             const rkeyLocal = TID.now();
+
             rootpost.push({
                 $type: "com.atproto.repo.applyWrites#create" as const,
                 collection: "app.bsky.feed.post" as `${string}.${string}.${string}`,
@@ -64,6 +65,18 @@ export default function Like() {
                     text: description,
                     createdAt: new Date().toISOString(),
                     locale: [locale]
+                },
+            });
+            rootpost.push({
+                $type: "com.atproto.repo.applyWrites#create" as const,
+                collection: "app.bsky.feed.threadgate" as `${string}.${string}.${string}`,
+                rkey: rkeyLocal,
+                value: {
+                    allow: [
+                        { $type: 'app.bsky.feed.threadgate#mentionRule' },
+                    ],
+                    createdAt: new Date().toISOString(),
+                    post: `at://${activeDid}/app.bsky.feed.post/${rkeyLocal}`
                 },
             });
 
@@ -138,6 +151,17 @@ export default function Like() {
                             $type: "com.atproto.repo.strongRef"
                         }
                     }
+                },
+            });
+
+            writes.push({
+                $type: "com.atproto.repo.applyWrites#create" as const,
+                collection: "app.bsky.feed.threadgate" as `${string}.${string}.${string}`,
+                rkey: rkeyLocal,
+                value: {
+                    allow: [],
+                    createdAt: new Date().toISOString(),
+                    post: `at://${activeDid}/app.bsky.feed.post/${rkeyLocal}`
                 },
             });
             //}
@@ -280,6 +304,26 @@ export default function Like() {
                         </Button>
                     </Group>
                 </>
+            }
+
+            {(likeSettings && useLike) && <Center> <Button
+                w="auto"
+                onClick={() => {
+                    if (likeSettings.apply?.uri) {
+                        const atUri = likeSettings.apply.uri; // ex: "at://did:plc:4voebgh2imlebm5kbaa5ov4v/app.bsky.feed.post/3mb6ogzj5g2wq"
+                        const match = atUri.match(/^at:\/\/(did:[^/]+)\/app\.bsky\.feed\.post\/(.+)$/);
+                        if (match) {
+                            const did = match[1];
+                            const postId = match[2];
+                            const webUrl = `https://bsky.app/profile/${did}/post/${postId}`;
+                            window.location.href = webUrl;
+                        }
+                    }
+                }}
+            >
+                {t('button.view')}
+            </Button></Center>
+
             }
 
             {(likeSettings && !useLike) &&

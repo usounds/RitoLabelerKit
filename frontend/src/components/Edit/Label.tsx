@@ -55,6 +55,7 @@ const buildNextLabelerDef = (
         blurs: 'none',
         severity: 'inform',
         defaultSetting: "warn",
+        adultOnly:false,
         locales,
     };
 

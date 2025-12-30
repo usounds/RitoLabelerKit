@@ -184,7 +184,7 @@ export function Login() {
                         mt="md"
                         required />
                     <Group justify="space-between" mt="lg" className={classes.controls}>
-                        {needPlcOpe &&
+                        {!needPlcOpe &&
                             <>
                                 <Alert variant="light" color="red" title="Alert">
                                     {t('message.plcOpe')}
