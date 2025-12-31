@@ -1,24 +1,26 @@
-FROM node:22-slim
-
+# ビルドステージ
+FROM node:22-alpine AS builder
 WORKDIR /app
 
-# ネイティブ依存がある可能性に備える（better-sqlite3 等）
-RUN apt-get update && apt-get install -y \
-  python3 \
-  make \
-  g++ \
-  libsqlite3-dev \
-  && rm -rf /var/lib/apt/lists/*
+# ビルドに必要なパッケージ
+RUN apk add --no-cache python3 make g++ sqlite-dev
 
 # 依存関係
 COPY package.json package-lock.json ./
 RUN npm install --no-audit --no-fund
 
-# ソース
+# ソースコピー & ビルド
 COPY . .
-
-# TypeScript build
 RUN npm run build
+
+# 本番ステージ
+FROM node:22-alpine
+WORKDIR /app
+
+# 本番に必要なファイルだけコピー
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
 
