@@ -128,11 +128,11 @@ function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.p
         });
     }
 }
-
 let jetstream: Jetstream | null = null;
 let reconnectTimer: NodeJS.Timeout | null = null;
 let connecting = false;
 let connected = false;
+const intervalMs = Number(process.env.CURSOR_UPDATE_INTERVAL) || 30000;
 
 function clearReconnectTimer() {
     if (reconnectTimer) {
@@ -144,12 +144,14 @@ function clearReconnectTimer() {
 function scheduleReconnect() {
     if (reconnectTimer || connecting || connected) return;
 
-    logger.warn('Scheduling Jetstream reconnect in 5s...');
+    const interval = 15000; // 15秒待つ
+    logger.warn(`Scheduling Jetstream reconnect in ${interval/1000}s...`);
     reconnectTimer = setTimeout(() => {
         reconnectTimer = null;
         startJetstream();
-    }, 5000);
+    }, interval);
 }
+
 
 function startJetstream() {
     if (connecting || connected) return;
@@ -174,30 +176,51 @@ function startJetstream() {
         return;
     }
 
-    if (!jetstream) {
-        jetstream = new Jetstream({
-            wantedCollections: [
-                'app.bsky.feed.post',
-                'app.bsky.feed.like',
-                'blue.rito.label.auto.like',
-                'blue.rito.label.auto.post',
-                'blue.rito.label.auto.random'
-            ],
-            endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
-            cursor: cursor,
-            ws: WebSocket,
-        });
-    }
+    // 新しいインスタンスを作成
+    jetstream = new Jetstream({
+        wantedCollections: [
+            'app.bsky.feed.post',
+            'app.bsky.feed.like',
+            'blue.rito.label.auto.like',
+            'blue.rito.label.auto.post',
+            'blue.rito.label.auto.random'
+        ],
+        endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
+        cursor: cursor,
+        ws: WebSocket,
+    });
 
-    const intervalMs = Number(process.env.CURSOR_UPDATE_INTERVAL) || 10000;
+    // 接続成功
+    jetstream.on('connected', () => {
+        connecting = false;
+        connected = true;
+        logger.info('Jetstream connected');
+    });
+
+    // 切断時
+    jetstream.on('closed', () => {
+        connecting = false;
+        connected = false;
+        logger.warn('Jetstream connection closed');
+        scheduleReconnect();
+    });
+
+    // エラー時
+    jetstream.on('error', (err) => {
+        connecting = false;
+        connected = false;
+        logger.error(err, 'Jetstream error:');
+        scheduleReconnect();
+    });
 
     try {
         jetstream.start();
     } catch (err) {
+        connecting = false;
+        connected = false;
         logger.error(err, 'Jetstream.start() threw');
         scheduleReconnect();
     }
-
     // Create / Update 共通化
     jetstream.onCreate('blue.rito.label.auto.post', handlePostEventWrapper);
     jetstream.onUpdate('blue.rito.label.auto.post', handlePostEventWrapper);
@@ -380,21 +403,6 @@ function startJetstream() {
         clearReconnectTimer();
         logger.info('Jetstream connected');
     });
-
-    jetstream.on('close', () => {
-        connecting = false;
-        if (connected) {
-            logger.warn('Jetstream connection closed');
-        }
-        connected = false;
-        scheduleReconnect();
-    });
-
-    jetstream.on('error', (error) => {
-        logger.error(`Jetstream error: ${error?.message ?? '(no message)'}`);
-        // close は呼ばない
-    });
-
 
     cursorUpdateInterval = setInterval(() => {
         if (jetstream?.cursor) {
