@@ -1,4 +1,11 @@
 :8080 {
+    # ==== CORS 共通設定 ====
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+
     # 固定ヘルスチェック
     handle_path /_health {
         respond "" 200

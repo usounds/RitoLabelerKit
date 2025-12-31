@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "blue.rito.label.auto.getServiceStatus",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get auto labeling service information",
+      "output": {
+        "encoding": "application/json",
+        "description": "Returns auto labeling service information",
+        "schema": {
+          "type": "object",
+          "required": [
+            "version",
+            "cursor"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "description": "Whether to automatically collect Bluesky posts to Rito bookmarks."
+            },
+            "cursor": {
+              "type": "string",
+              "format": "datetime",
+              "description": "User's preferred language for Auto Generate Bookmark."
+            }
+          }
+        }
+      }
+    }
+  }
+}
