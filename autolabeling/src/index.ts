@@ -8,13 +8,14 @@ import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, up
 import logger from './lib/logger.js';
 import { LikeRecord, LikeSubjectRecord, memoryDB, PostRecord } from './lib/type.js';
 import express from 'express';
+
+import cursorPkg from '../package.json' with { type: 'json' };
 const queue = new PQueue({ concurrency: 1 });
 
 const port = parseInt(process.env.PORT || '8080');
 
 const app = express();
 app.get('/', (req, res) => res.send('OK'));
-app.listen(port, () => console.log(`Health check listening on port ${port}`));
 
 
 if (process.env.LABELER_DID === 'DUMMY') {
@@ -169,6 +170,7 @@ function startJetstream() {
         }
 
         logger.info(`Cursor from: ${cursor} (${epochUsToDateTime(cursor)})`);
+        
     } catch (err) {
         connecting = false;
         logger.error(err, 'Startup preparation failed');
@@ -448,3 +450,13 @@ process.on('SIGINT', () => {
   logger.info('SIGINT received, shutting down gracefully...');
   process.exit(0);
 });
+
+
+app.get('/xrpc/blue.rito.label.auto.getServiceStatus', (req, res) => {
+  res.json({
+    version: cursorPkg.version,
+    cursor: new Date(cursor / 1000).toISOString()
+  });
+});
+
+app.listen(port, () => console.log(`Health check listening on port ${port}`));

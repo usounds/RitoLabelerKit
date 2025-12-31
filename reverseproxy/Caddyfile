@@ -3,7 +3,17 @@
     handle_path /_health {
         respond "" 200
     }
-    # WebSocket / HTTP API を LabelerServer に転送
+
+    # /xrpc/blue.rito.label.getServiceStatus* を別ポートに転送
+    handle /xrpc/blue.rito.label.auto.getServiceStatus {
+        reverse_proxy rito-auto-labeling-service.railway.internal:8080 {
+            transport http {
+                versions 1.1
+            }
+        }
+    }
+
+    # それ以外は LabelerServer に転送
     reverse_proxy skyware.railway.internal:8080 {
         transport http {
             versions 1.1
