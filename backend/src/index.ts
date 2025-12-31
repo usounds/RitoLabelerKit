@@ -1,6 +1,5 @@
 import { CommitCreateEvent, CommitDeleteEvent, CommitUpdateEvent, Jetstream } from '@skyware/jetstream';
 import 'dotenv/config';
-import path from 'node:path';
 import PQueue from 'p-queue';
 import WebSocket from 'ws';
 import type { } from './lexicons/index.js';
@@ -130,7 +129,7 @@ function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.p
     }
 }
 
-
+let jetstream: Jetstream | null = null;
 let reconnectTimer: NodeJS.Timeout | null = null;
 let connecting = false;
 let connected = false;
@@ -158,7 +157,6 @@ function startJetstream() {
     connecting = true;
     logger.info('Starting Jetstream...');
 
-    // 起動時に呼び出し
     try {
         loadMemoryDB();
 
@@ -176,27 +174,29 @@ function startJetstream() {
         return;
     }
 
-    logger.info(`Cursor from: ${cursor} (${epochUsToDateTime(cursor)})`)
-
-    const jetstream = new Jetstream({
-        wantedCollections: ['app.bsky.feed.post', 'app.bsky.feed.like', 'blue.rito.label.auto.like', 'blue.rito.label.auto.post', 'blue.rito.label.auto.random'],
-        endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
-        cursor: cursor,
-        ws: WebSocket,
-    });
+    if (!jetstream) {
+        jetstream = new Jetstream({
+            wantedCollections: [
+                'app.bsky.feed.post',
+                'app.bsky.feed.like',
+                'blue.rito.label.auto.like',
+                'blue.rito.label.auto.post',
+                'blue.rito.label.auto.random'
+            ],
+            endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
+            cursor: cursor,
+            ws: WebSocket,
+        });
+    }
 
     const intervalMs = Number(process.env.CURSOR_UPDATE_INTERVAL) || 10000;
-
 
     try {
         jetstream.start();
     } catch (err) {
-        connecting = false;
         logger.error(err, 'Jetstream.start() threw');
         scheduleReconnect();
-        return;
     }
-
 
     // Create / Update 共通化
     jetstream.onCreate('blue.rito.label.auto.post', handlePostEventWrapper);
@@ -397,7 +397,7 @@ function startJetstream() {
 
 
     cursorUpdateInterval = setInterval(() => {
-        if (jetstream.cursor) {
+        if (jetstream?.cursor) {
             logger.info(`Cursor updated to: ${jetstream.cursor} (${epochUsToDateTime(jetstream.cursor)})`);
 
             // DB に保存
@@ -418,10 +418,10 @@ function startJetstream() {
 
 
 // 起動
-logger.info('Waiting 30s before starting Jetstream...');
+logger.info('Waiting 10s before starting Jetstream...');
 setTimeout(() => {
     startJetstream();
-}, 30_000);
+}, 10_000);
 
 process.on('uncaughtException', err => {
     logger.fatal(err, 'uncaughtException');
