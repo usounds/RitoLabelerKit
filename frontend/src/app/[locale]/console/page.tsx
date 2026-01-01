@@ -81,7 +81,7 @@ export default function Console() {
                     setAutoLabelingJetstreamCursor(new Date(resultbody.jetstreamCursor))
                     setAutoLabelingQueueCursor(new Date(resultbody.queueCursor))
 
-                    if (resultbody.version <= '0.1.1') {
+                    if (resultbody.version <= '0.1.2') {
                         notifications.show({
                             id: 'login-process',
                             title: t('title'),
