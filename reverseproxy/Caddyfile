@@ -10,9 +10,13 @@
     handle_path /_health {
         respond "" 200
     }
+    
+    @autoLabeler {
+        path_regexp auto ^/xrpc/blue\.rito\.label\.auto\..*
+    }
 
-    # /xrpc/blue.rito.label.getServiceStatus* を別ポートに転送
-    handle /xrpc/blue.rito.label.auto.getServiceStatus {
+    # /xrpc/blue.rito.label.auto* を別ポートに転送
+    handle @autoLabeler {
         reverse_proxy rito-auto-labeling-service.railway.internal:8080 {
             transport http {
                 versions 1.1

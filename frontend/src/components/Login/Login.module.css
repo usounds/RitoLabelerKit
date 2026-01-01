@@ -1,0 +1,17 @@
+.title {
+  font-size: 26px;
+  font-weight: 500;
+  font-family: Outfit, var(--mantine-font-family);
+}
+
+.controls {
+  @media (max-width: 768px) {
+  }
+}
+
+.control {
+  @media (max-width: 768px) {
+    width: 100%;
+    text-align: center;
+  }
+}

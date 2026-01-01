@@ -5,10 +5,10 @@ import 'dotenv/config';
 const port = parseInt(process.env.PORT || '8080');
 
 const dbPath = process.env.DB_PATH
-    ? path.join(process.env.DB_PATH, 'skyware.db') // DB_PATH がある場合
-    : path.join(process.cwd(), 'data', 'skyware.db'); // ない場合はカレントディレクトリ/data/skyware.db
+  ? path.join(process.env.DB_PATH, 'skyware.db')
+  : path.join('/data', 'skyware.db');
 
-    const server = new LabelerServer({
+const server = new LabelerServer({
     did: process.env.LABELER_DID || '',
     signingKey: process.env.LABELER_SIGNED_SEC_KEY || '',
     dbPath: dbPath
@@ -17,7 +17,7 @@ const dbPath = process.env.DB_PATH
 console.log(dbPath)
 
 server.start(
-    { port, host: '0.0.0.0' }, 
+    { port, host: '0.0.0.0' },
     (error, address) => {
         if (error) {
             console.error("Failed to start server:", error);
