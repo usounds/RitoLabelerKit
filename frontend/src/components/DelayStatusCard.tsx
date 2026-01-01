@@ -15,8 +15,8 @@ export function DelayStatusCard({
   maxMinutes = 60,
 }: DelayStatusCardProps) {
   const t = useTranslations('console.manage');
-  const diffMs = Math.abs(to.getTime() - from.getTime());
-  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffMs = to.getTime() - from.getTime();
+  const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
 
   const caption =
     diffMinutes <= 1
