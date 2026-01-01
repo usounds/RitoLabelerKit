@@ -21,7 +21,8 @@ export default function Console() {
     const t = useTranslations('console');
     const setLabelerVersion = useManageStore(state => state.setLabelerVersion);
     const setAutoLabelingVersion = useManageStore(state => state.setAutoLabelingVersion);
-    const setAutoLabelingCursor = useManageStore(state => state.setAutoLabelingCursor);
+    const setAutoLabelingJetstreamCursor = useManageStore(state => state.setAutoLabelingJetstreamCursor);
+    const setAutoLabelingQueueCursor = useManageStore(state => state.setAutoLabelingQueueCursor);
     const userProf = useXrpcAgentStore(state => state.userProf);
     const activeDid = useXrpcAgentStore(state => state.activeDid);
     const thisClient = useXrpcAgentStore(state => state.thisClient);
@@ -77,7 +78,8 @@ export default function Console() {
                     const resultbody = await result2.json() as BlueRitoLabelAutoGetServiceStatus.$output
 
                     setAutoLabelingVersion(resultbody.version)
-                    setAutoLabelingCursor(new Date(resultbody.cursor))
+                    setAutoLabelingJetstreamCursor(new Date(resultbody.jetstreamCursor))
+                    setAutoLabelingQueueCursor(new Date(resultbody.queueCursor))
 
                     if (resultbody.version <= '0.1.1') {
                         notifications.show({

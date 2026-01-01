@@ -46,7 +46,7 @@ export async function applyLabelForUser(target: string, label: string[], type: "
     }
 
     try {
-        const resukt = await rpc.post('tools.ozone.moderation.emitEvent', {
+        await rpc.post('tools.ozone.moderation.emitEvent', {
             input: {
                 createdBy: process.env.LABELER_DID! as `did:${string}:${string}`,
                 subject,
@@ -100,7 +100,7 @@ export async function applyLabelForPost(uri: string, cid: string, label: string[
     }
 
     try {
-        const result = await rpc.post('tools.ozone.moderation.emitEvent', {
+        await rpc.post('tools.ozone.moderation.emitEvent', {
             input: {
                 createdBy: process.env.LABELER_DID! as `did:${string}:${string}`,
                 subject,

@@ -5,7 +5,7 @@
     "main": {
       "type": "record",
       "description": "Setting Post based auto labeling.",
-      "key": "tid",
+      "key": "any",
       "record": {
         "type": "object",
         "required": [
@@ -22,6 +22,8 @@
           },
           "condition": {
             "type": "string",
+            "minGraphemes": 10,
+            "minLength": 100,
             "description": "Setting apply condition with regex"
           },
           "appliedTo": {

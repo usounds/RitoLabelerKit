@@ -2,17 +2,19 @@
 import { TableScrollArea } from "@/components/LabelTable/Table";
 import Like from "@/components/Tab/Like";
 import Post from "@/components/Tab/Post";
-import { BlueRitoLabelAutoLike, BlueRitoLabelAutoPost, BlueRitoLabelAutoLikeSettings } from '@/lexicons/index';
+import { BlueRitoLabelAutoLike, BlueRitoLabelAutoLikeSettings, BlueRitoLabelAutoPost } from '@/lexicons/index';
 import { isPlcOrWebDid } from '@/lib/HandleAgent';
 import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManageStore } from "@/lib/ManageStore";
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { AppBskyLabelerService, } from '@atcute/bluesky';
-import { Tabs, Button, Group, Card, Progress, Text } from '@mantine/core';
+import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
+import { Button, Group, Tabs, SimpleGrid } from '@mantine/core';
 import { Cog, FilePenLine, Heart, Tag } from 'lucide-react';
-import { useEffect, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
+import { useEffect, useState } from 'react';
+import { DelayStatusCard } from '@/components/DelayStatusCard';
+
 
 export default function Manage() {
     const t = useTranslations('console.manage');
@@ -22,7 +24,8 @@ export default function Manage() {
     const setPost = useManageStore(state => state.setPost);
     const setLabelerDef = useManageStore(state => state.setLabelerDef);
     const setLikeSettings = useManageStore(state => state.setLikeSettings);
-    const autoLabelingCursor = useManageStore(state => state.autoLabelingCursor);
+    const autoLabelingCursor = useManageStore(state => state.autoLabelingJetstreamCursor);
+    const autoLabelingQueueCursor = useManageStore(state => state.autoLabelingQueueCursor);
     const setUseLike = useManageStore(state => state.setUseLike);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -169,13 +172,6 @@ export default function Manage() {
         return
     }
 
-    const cursorDate = new Date(autoLabelingCursor ?? now);
-    const diffMs = Math.abs(now - cursorDate.getTime());
-    const diffMinutes = Math.floor(diffMs / 60000);
-    const progressValue = Math.max(
-        0,
-        Math.min(100, (60 - diffMinutes) / 60 * 100)
-    );
     return (
         <Tabs defaultValue="label">
             <Tabs.List>
@@ -206,20 +202,18 @@ export default function Manage() {
             </Tabs.Panel>
 
             <Tabs.Panel value="settings">
-                <Card withBorder radius="md" mt="sm" padding="xl" bg="var(--mantine-color-body)">
-                    <Text fz="xs" tt="uppercase" fw={700} c="dimmed">
-                        {t('settings.field.delay.title')}
-                    </Text>
-                    <Text fz="lg" fw={500}>
-
-                        {diffMinutes <= 1
-                            ? t('settings.field.delay.nodelay')
-                            : t('settings.field.delay.description', {
-                                minute: diffMinutes,
-                            })}
-                    </Text>
-                    <Progress value={progressValue} mt="md" size="lg" radius="xl" />
-                </Card>
+                <SimpleGrid cols={2} spacing="md">
+                    <DelayStatusCard
+                        from={autoLabelingCursor || new Date()}
+                        to={new Date()}
+                        title={t('settings.field.delay.title')}
+                    />
+                    <DelayStatusCard
+                        from={autoLabelingQueueCursor || new Date()}
+                        to={autoLabelingCursor || new Date()}
+                        title={t('settings.field.delay.queue')}
+                    />
+                </SimpleGrid>
 
                 <Group
                     align="center"        // 垂直方向の中央揃え

@@ -40,6 +40,7 @@ export default function PostForm({
   const t = useTranslations('console.manage.post');
   const thisClient = useXrpcAgentStore(state => state.thisClient);
   const activeDid = useXrpcAgentStore(state => state.activeDid);
+  const userProf = useXrpcAgentStore(state => state.userProf);
   const labelerDef = useManageStore(state => state.labelerDef);
   const post = useManageStore(state => state.post);
   const setPost = useManageStore(state => state.setPost);
@@ -61,7 +62,7 @@ export default function PostForm({
     initialValues: {
       label: prev?.label || '',
       appliedTo: (prev?.appliedTo || 'account') as AppliedTo,
-      condition: prev?.condition || '',
+      condition: prev?.condition || '@'+userProf?.handle+' ',
       durationInHours: prev?.durationInHours || 0,
       action: 'add',
     },
@@ -69,6 +70,8 @@ export default function PostForm({
       label: (v) => (!v ? 'Required' : null),
       condition: (v) => {
         if (!v) return 'Required';
+        if(v.length<=10) return t('field.condition.message.length')
+        if(!v.includes(userProf?.handle||'')) return t('field.condition.message.mustmention')
         try {
           new RegExp(v);
           return null; // 正しい正規表現
@@ -224,6 +227,7 @@ export default function PostForm({
           placeholder={t('field.condition.placeholder')}
           autosize
           minRows={2}
+          minLength={10}
           styles={{ input: { fontSize: 16 } }}
           {...form.getInputProps('condition')}
         />

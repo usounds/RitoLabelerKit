@@ -3,7 +3,7 @@ import * as v from "@atcute/lexicons/validations";
 import type {} from "@atcute/lexicons/ambient";
 
 const _mainSchema = /*#__PURE__*/ v.record(
-  /*#__PURE__*/ v.tidString(),
+  /*#__PURE__*/ v.string(),
   /*#__PURE__*/ v.object({
     $type: /*#__PURE__*/ v.literal("blue.rito.label.auto.post"),
     /**
@@ -16,8 +16,13 @@ const _mainSchema = /*#__PURE__*/ v.record(
     appliedTo: /*#__PURE__*/ v.string(),
     /**
      * Setting apply condition with regex
+     * @minLength 100
+     * @minGraphemes 10
      */
-    condition: /*#__PURE__*/ v.string(),
+    condition: /*#__PURE__*/ v.constrain(/*#__PURE__*/ v.string(), [
+      /*#__PURE__*/ v.stringLength(100),
+      /*#__PURE__*/ v.stringGraphemes(10),
+    ]),
     createdAt: /*#__PURE__*/ v.datetimeString(),
     /**
      * Hour based label dulation. 0 will be no duration.

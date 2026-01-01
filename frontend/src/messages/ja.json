@@ -186,7 +186,11 @@
                     "condition": {
                         "title": "条件",
                         "description": "このポストの本文に反応します。",
-                        "placeholder": "@label.rito.blue 戌のラベルを貼って"
+                        "placeholder": "@label.rito.blue 戌のラベルを貼って",
+                        "message":{
+                            "length" : "条件は10文字以上必要です",
+                            "mustmention" : "ラベラーアカウントのメンションが必須です"
+                        }
                     },
                     "durationInHours": {
                         "title": "ラベルの生存期間",
@@ -203,7 +207,8 @@
             "settings": {
                 "field":{
                     "delay":{
-                    "title":"自動ラベル処理",
+                    "title":"Jetstream受信",
+                    "queue":"自動ラベル処理",
                     "nodelay":"遅延なし",
                     "description":"{minute}分遅延しています"
                     }

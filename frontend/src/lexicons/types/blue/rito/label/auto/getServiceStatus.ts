@@ -10,11 +10,15 @@ const _mainSchema = /*#__PURE__*/ v.query(
       type: "lex",
       schema: /*#__PURE__*/ v.object({
         /**
-         * User's preferred language for Auto Generate Bookmark.
+         * Jetstream lisner cursor. If this value is delay, may be upstream failer.
          */
-        cursor: /*#__PURE__*/ v.datetimeString(),
+        jetstreamCursor: /*#__PURE__*/ v.datetimeString(),
         /**
-         * Whether to automatically collect Bluesky posts to Rito bookmarks.
+         * Queue cursor. If this balue is delay, may be this service failer.
+         */
+        queueCursor: /*#__PURE__*/ v.datetimeString(),
+        /**
+         * Auto Labering service version
          */
         version: /*#__PURE__*/ v.string(),
       }),

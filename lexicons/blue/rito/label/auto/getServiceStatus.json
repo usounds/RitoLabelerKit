@@ -12,17 +12,23 @@
           "type": "object",
           "required": [
             "version",
-            "cursor"
+            "jetstreamCursor",
+            "queueCursor"
           ],
           "properties": {
             "version": {
               "type": "string",
-              "description": "Whether to automatically collect Bluesky posts to Rito bookmarks."
+              "description": "Auto Labering service version"
             },
-            "cursor": {
+            "jetstreamCursor": {
               "type": "string",
               "format": "datetime",
-              "description": "User's preferred language for Auto Generate Bookmark."
+              "description": "Jetstream lisner cursor. If this value is delay, may be upstream failer."
+            },
+            "queueCursor": {
+              "type": "string",
+              "format": "datetime",
+              "description": "Queue cursor. If this balue is delay, may be this service failer."
             }
           }
         }

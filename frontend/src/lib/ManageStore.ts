@@ -18,7 +18,8 @@ type ManageStore = {
   useLike: boolean
   labelerVersion: string
   autoLabelingVersion: string
-  autoLabelingCursor: Date | null
+  autoLabelingJetstreamCursor: Date | null
+  autoLabelingQueueCursor: Date | null
 
   setLabelerDef: (v: AppBskyLabelerService.Main | null) => void
   setLikeSettings: (v: BlueRitoLabelAutoLikeSettings.Main | null) => void
@@ -27,7 +28,8 @@ type ManageStore = {
   setUseLike: (v: boolean) => void
   setLabelerVersion: (v: string) => void
   setAutoLabelingVersion: (v: string) => void
-  setAutoLabelingCursor: (v: Date | null) => void
+  setAutoLabelingJetstreamCursor: (v: Date ) => void
+  setAutoLabelingQueueCursor: (v: Date ) => void
 }
 
 export const useManageStore = create<ManageStore>((set) => ({
@@ -38,7 +40,8 @@ export const useManageStore = create<ManageStore>((set) => ({
   useLike: false,
   labelerVersion:'',
   autoLabelingVersion:'',
-  autoLabelingCursor: null,
+  autoLabelingJetstreamCursor: new Date(),
+  autoLabelingQueueCursor: new Date(),
 
   setLabelerDef: (labelerDef) => set({ labelerDef }),
   setLikeSettings: (likeSettings) => set({ likeSettings }),
@@ -47,5 +50,6 @@ export const useManageStore = create<ManageStore>((set) => ({
   setPost: (post) => set({ post }),
   setLabelerVersion: (labelerVersion) => set({ labelerVersion }),
   setAutoLabelingVersion: (autoLabelingVersion) => set({ autoLabelingVersion }),
-  setAutoLabelingCursor: (autoLabelingCursor) => set({ autoLabelingCursor }),
+  setAutoLabelingJetstreamCursor: (autoLabelingJetstreamCursor) => set({ autoLabelingJetstreamCursor: autoLabelingJetstreamCursor }),
+  setAutoLabelingQueueCursor: (autoLabelingQueueCursor) => set({ autoLabelingJetstreamCursor: autoLabelingQueueCursor }),
 }))
