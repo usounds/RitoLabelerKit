@@ -14,8 +14,8 @@ import cursorPkg from '../package.json' with { type: 'json' };
 
 // キュー設定
 const queue = new PQueue({ concurrency: 1 });
-const QUEUE_WARN = 1000;
-const QUEUE_DROP = 2000;
+const QUEUE_WARN = 2000;
+const QUEUE_DROP = 20000;
 let warned = false;
 let overflowed = false;
 
