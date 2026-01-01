@@ -7,15 +7,50 @@ import { applyLabelForUser, applyLabelForPost } from './lib/atcute.js';
 import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, upsertLike, upsertLikeSubject, upsertPost } from './lib/db.js';
 import logger from './lib/logger.js';
 import { LikeRecord, LikeSubjectRecord, memoryDB, PostRecord } from './lib/type.js';
-import express from 'express';
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
 
 import cursorPkg from '../package.json' with { type: 'json' };
+
+// キュー設定
 const queue = new PQueue({ concurrency: 1 });
+const QUEUE_WARN = 1000;
+const QUEUE_DROP = 2000;
+let warned = false;
+let overflowed = false;
+
+// キューの閾値
+function enqueue(task: () => Promise<void>) {
+  // DROP 超過
+  if (queue.size > QUEUE_DROP) {
+    if (!overflowed) {
+      logger.error(`Queue overflow: size=${queue.size}, dropping tasks`);
+      overflowed = true;
+    }
+    return;
+  } else {
+    // 回復したらリセット
+    overflowed = false;
+  }
+
+  // WARN 超過
+  if (queue.size > QUEUE_WARN) {
+    if (!warned) {
+      logger.warn(`Queue growing: size=${queue.size}`);
+      warned = true;
+    }
+  } else {
+    // 回復したらリセット
+    warned = false;
+  }
+
+  queue.add(task).catch(err => {
+    logger.error(err, 'Queue task failed');
+  });
+}
+
 
 const port = parseInt(process.env.PORT || '8080');
-
-const app = express();
-app.get('/', (req, res) => res.send('OK'));
 
 
 if (process.env.LABELER_DID === 'DUMMY') {
@@ -27,7 +62,8 @@ if (process.env.LABELER_DID === 'DUMMY') {
     }
 }
 
-let cursor = 0;
+let jetstreamCursor = 0;
+let queueCursor = 0;
 let prev_time_us = 0
 let cursorUpdateInterval: NodeJS.Timeout;
 // 起動時にオンメモリにロード
@@ -107,10 +143,10 @@ function handlePostEvent(rkey: string, data: {
 
 // 共通処理
 function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.post'> | CommitUpdateEvent<'blue.rito.label.auto.post'>) {
-    cursor = event.time_us;
+    jetstreamCursor = event.time_us;
 
     if (process.env.LABELER_DID === event.did) {
-        queue.add(async () => {
+        enqueue(async () => {
             try {
                 const record = event.commit.record as unknown as {
                     tid: string;
@@ -146,7 +182,7 @@ function scheduleReconnect() {
     if (reconnectTimer || connecting || connected) return;
 
     const interval = 15000; // 15秒待つ
-    logger.warn(`Scheduling Jetstream reconnect in ${interval/1000}s...`);
+    logger.warn(`Scheduling Jetstream reconnect in ${interval / 1000}s...`);
     reconnectTimer = setTimeout(() => {
         reconnectTimer = null;
         startJetstream();
@@ -164,13 +200,13 @@ function startJetstream() {
         loadMemoryDB();
 
         try {
-            cursor = getCursor();
+            jetstreamCursor = getCursor();
         } catch {
-            cursor = Math.floor(Date.now() * 1000);
+            jetstreamCursor = Math.floor(Date.now() * 1000);
         }
 
-        logger.info(`Cursor from: ${cursor} (${epochUsToDateTime(cursor)})`);
-        
+        logger.info(`cursor loaded from db : "${epochUsToDateTime(jetstreamCursor)}"`);
+
     } catch (err) {
         connecting = false;
         logger.error(err, 'Startup preparation failed');
@@ -188,7 +224,7 @@ function startJetstream() {
             'blue.rito.label.auto.random'
         ],
         endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
-        cursor: cursor,
+        cursor: jetstreamCursor,
         ws: WebSocket,
     });
 
@@ -228,11 +264,11 @@ function startJetstream() {
     jetstream.onUpdate('blue.rito.label.auto.post', handlePostEventWrapper);
 
     jetstream.onDelete('blue.rito.label.auto.post', (event: CommitDeleteEvent<'blue.rito.label.auto.post'>) => {
-        cursor = event.time_us;
+        jetstreamCursor = event.time_us;
 
         // 自分が作成したラベルのみ処理
         if (process.env.LABELER_DID === event.did) {
-            queue.add(async () => {
+            enqueue(async () => {
                 try {
                     logger.info(`Delete Post definition. ${event.commit.rkey}`);
 
@@ -253,9 +289,9 @@ function startJetstream() {
     });
 
     jetstream.onCreate('app.bsky.feed.post', (event: CommitCreateEvent<'app.bsky.feed.post'>) => {
-        cursor = event.time_us;
+        jetstreamCursor = event.time_us;
 
-        queue.add(async () => {
+        enqueue(async () => {
             try {
                 const text = event.commit.record.text || '';
 
@@ -265,7 +301,6 @@ function startJetstream() {
                         if (regex.test(text)) {
                             // ラベルを適用する処理
                             logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey}. action:${postRule.action}`);
-                            logger.info(postRule);
                             if (postRule.appliedTo === 'account') {
                                 if (!postRule.action) return
                                 await applyLabelForUser(event.did, [postRule.label], postRule.action, postRule.durationInHours)
@@ -292,9 +327,9 @@ function startJetstream() {
 
     // --- イベント登録 ---
     jetstream.onCreate('blue.rito.label.auto.like', (event: CommitCreateEvent<'blue.rito.label.auto.like'>) => {
-        cursor = event.time_us;
+        jetstreamCursor = event.time_us;
         if (process.env.LABELER_DID === event.did) {
-            queue.add(async () => {
+            enqueue(async () => {
                 try {
                     const record = event.commit.record as unknown as { subject: string; createdAt: string; $type: string };
                     handleLikeEvent(event.commit.rkey, record);
@@ -309,9 +344,9 @@ function startJetstream() {
     });
 
     jetstream.onUpdate('blue.rito.label.auto.like', (event: CommitUpdateEvent<'blue.rito.label.auto.like'>) => {
-        cursor = event.time_us;
+        jetstreamCursor = event.time_us;
         if (process.env.LABELER_DID === event.did) {
-            queue.add(async () => {
+            enqueue(async () => {
                 try {
                     const record = event.commit.record as unknown as { subject: string; createdAt: string; $type: string };
                     handleLikeEvent(event.commit.rkey, record);
@@ -324,13 +359,15 @@ function startJetstream() {
     });
 
     jetstream.onDelete('blue.rito.label.auto.like', (event: CommitDeleteEvent<'blue.rito.label.auto.like'>) => {
-        cursor = event.time_us;
+        jetstreamCursor = event.time_us;
 
         if (process.env.LABELER_DID === event.did) {
-            queue.add(async () => {
+            enqueue(async () => {
                 try {
                     logger.info(`Delete Like definition. ${event.commit.rkey}`)
                     deleteLike(event.commit.rkey);
+                    const idx = memoryDB.likes.findIndex(l => l.rkey === event.commit.rkey);
+                    if (idx >= 0) memoryDB.likes.splice(idx, 1);
                 } catch (e) {
                     logger.error(e)
 
@@ -342,11 +379,13 @@ function startJetstream() {
 
     // --- Jetstream Like create ---
     jetstream.onCreate('app.bsky.feed.like', (event: CommitCreateEvent<'app.bsky.feed.like'>) => {
-        cursor = event.time_us;
-        queue.add(async () => {
+        jetstreamCursor = event.time_us;
+        enqueue(async () => {
             try {
                 const likeUri = `at://${event.did}/app.bsky.feed.like/${event.commit.rkey}`;
                 const likeSubjectUri = (event.commit.record as any).subject.uri; // Like された投稿の URI
+
+                
 
                 // memoryDB.likes の投稿に Like がついた場合のみ処理
                 const targetPost = memoryDB.likes.find(like => like.subject === likeSubjectUri);
@@ -375,10 +414,12 @@ function startJetstream() {
 
     // --- Jetstream Like delete ---
     jetstream.onDelete('app.bsky.feed.like', (event: CommitDeleteEvent<'app.bsky.feed.like'>) => {
-        cursor = event.time_us;
-        queue.add(async () => {
+        jetstreamCursor = event.time_us;
+        enqueue(async () => {
             try {
                 const likeUri = `at://${event.did}/app.bsky.feed.like/${event.commit.rkey}`;
+
+                queueCursor = event.time_us
 
                 // メモリから削除
                 const idx = memoryDB.likeSubjects.findIndex(ls => ls.subjectUri === likeUri);
@@ -408,7 +449,9 @@ function startJetstream() {
 
     cursorUpdateInterval = setInterval(() => {
         if (jetstream?.cursor) {
-            logger.info(`Cursor updated to: ${jetstream.cursor} (${epochUsToDateTime(jetstream.cursor)})`);
+            logger.info(
+                `jetstreamCursor=${jetstreamCursor} jetstreamCursorISO="${epochUsToDateTime(jetstreamCursor)}" queueCursor=${queueCursor} queueCursorISO="${epochUsToDateTime(queueCursor)}" size=${queue.size} pending=${queue.pending}`
+            );
 
             // DB に保存
             try {
@@ -428,10 +471,10 @@ function startJetstream() {
 
 
 // 起動
-logger.info('Waiting 10s before starting Jetstream...');
+logger.info('Waiting 3s before starting Jetstream...');
 setTimeout(() => {
     startJetstream();
-}, 10_000);
+}, 3_000);
 
 process.on('uncaughtException', err => {
     logger.fatal(err, 'uncaughtException');
@@ -442,21 +485,30 @@ process.on('unhandledRejection', err => {
 });
 
 process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully...');
-  process.exit(0);
+    logger.info('SIGTERM received, shutting down gracefully...');
+    process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully...');
-  process.exit(0);
+    logger.info('SIGINT received, shutting down gracefully...');
+    process.exit(0);
 });
 
 
-app.get('/xrpc/blue.rito.label.auto.getServiceStatus', (req, res) => {
-  res.json({
+// xrpc endpoint
+const app = new Hono();
+app.get('/', c => c.text('OK'));
+
+
+app.get('/xrpc/blue.rito.label.auto.getServiceStatus', (c) => {
+  return c.json({
     version: cursorPkg.version,
-    cursor: new Date(cursor / 1000).toISOString()
+    jetstreamCursor: new Date(jetstreamCursor / 1000).toISOString(),
+    queueCursor: new Date(queueCursor / 1000).toISOString(),
   });
 });
 
-app.listen(port, () => console.log(`Health check listening on port ${port}`));
+serve({
+  fetch: app.fetch,
+  port,
+});
