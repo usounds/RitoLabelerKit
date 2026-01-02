@@ -212,6 +212,9 @@
                     "nodelay":"遅延なし",
                     "description":"{minute}分遅延しています"
                     }
+                },
+                "inform":{
+                    "serverdown" : "自動ラベルサーバーがダウンしています。RailwayでRestartしてください。"
                 }
             }
         }

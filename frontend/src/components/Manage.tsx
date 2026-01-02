@@ -8,11 +8,12 @@ import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManage
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { AppBskyLabelerService, } from '@atcute/bluesky';
 import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
-import { Button, Group, Tabs, SimpleGrid } from '@mantine/core';
+import { Alert, Button, Group, Tabs, SimpleGrid } from '@mantine/core';
 import { Cog, FilePenLine, Heart, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { MessageCircleWarning } from 'lucide-react';
 import { DelayStatusCard } from '@/components/DelayStatusCard';
 
 
@@ -32,7 +33,6 @@ export default function Manage() {
     const locale = useLocale();
     const setUserProf = useXrpcAgentStore(state => state.setUserProf);
     const setActiveDid = useXrpcAgentStore(state => state.setActiveDid);
-    const [now] = useState<number>(() => Date.now());
 
     async function fetchAllLikes(): Promise<BlueRitoLabelAutoLikeWithRkey[]> {
         const result: BlueRitoLabelAutoLikeWithRkey[] = [];
@@ -203,7 +203,7 @@ export default function Manage() {
 
             <Tabs.Panel value="settings">
                 <SimpleGrid cols={2} spacing="md">
-                    {autoLabelingCursor &&
+                    {autoLabelingCursor !== null &&
                         <DelayStatusCard
                             from={autoLabelingCursor}
                             to={new Date()}
@@ -218,7 +218,15 @@ export default function Manage() {
                             title={t('settings.field.delay.queue')}
                         />
                     }
+
                 </SimpleGrid>
+                <Group
+                    align="center"        // 垂直方向の中央揃え
+                    style={{ justifyContent: 'center' }} // 横方向の中央揃え
+                    mt="sm"
+                >
+                    <Alert variant="light" color='red' icon={<MessageCircleWarning />}>{t('settings.inform.serverdown')}</Alert>
+                </Group>
 
                 <Group
                     align="center"        // 垂直方向の中央揃え

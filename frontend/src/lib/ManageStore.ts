@@ -40,8 +40,8 @@ export const useManageStore = create<ManageStore>((set) => ({
   useLike: false,
   labelerVersion:'',
   autoLabelingVersion:'',
-  autoLabelingJetstreamCursor: new Date(),
-  autoLabelingQueueCursor: new Date(),
+  autoLabelingJetstreamCursor: null,
+  autoLabelingQueueCursor: null,
 
   setLabelerDef: (labelerDef) => set({ labelerDef }),
   setLikeSettings: (likeSettings) => set({ likeSettings }),
