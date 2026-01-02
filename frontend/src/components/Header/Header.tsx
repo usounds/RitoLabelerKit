@@ -4,7 +4,8 @@ import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { Client } from '@atcute/client';
 import { isDid } from '@atcute/lexicons/syntax';
 import { OAuthUserAgent, getSession } from '@atcute/oauth-browser-client';
-import { Avatar, Group, useMantineTheme } from '@mantine/core';
+import { Avatar, Group, HoverCard } from '@mantine/core';
+import UserButton from '@/components/User/UserButton';
 import { useLocale } from 'next-intl';
 import NextImage from 'next/image';
 import Link from 'next/link';
@@ -87,7 +88,7 @@ export default function Header() {
     <header className={classes.header}>
       <div className={classes.inner}>
         <Group gap="xs">
-          <NextImage src='/favicon.png' width={20} height={20} alt="icon"/>
+          <NextImage src='/favicon.png' width={20} height={20} alt="icon" />
           <Link href="/" className={classes.link}>
             Rito Labeler Console
           </Link>
@@ -96,7 +97,16 @@ export default function Header() {
         <Group>
           <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
             {items}
-            <Avatar src={userProf?.avatar} size={26} />
+            <HoverCard >
+              <HoverCard.Target>
+                <Avatar src={userProf?.avatar} size={26} />
+              </HoverCard.Target>
+              {userProf &&
+                <HoverCard.Dropdown>
+                  <UserButton userProf={userProf} />
+                </HoverCard.Dropdown>
+              }
+            </HoverCard>
           </Group>
         </Group>
       </div>

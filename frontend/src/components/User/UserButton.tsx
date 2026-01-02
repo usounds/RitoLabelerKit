@@ -1,12 +1,10 @@
-import { Avatar, Group, Text, UnstyledButton } from '@mantine/core';
-import classes from './UserButton.module.css';
 import { AppBskyActorDefs } from '@atcute/bluesky';
+import { Avatar, Group, Text } from '@mantine/core';
 interface InitalProps {
     userProf: AppBskyActorDefs.ProfileViewDetailed;
 }
 export default function UserButton({ userProf }: InitalProps) {
   return (
-    <UnstyledButton className={classes.user}>
       <Group>
         <Avatar
           src={userProf.avatar}
@@ -24,6 +22,5 @@ export default function UserButton({ userProf }: InitalProps) {
         </div>
 
       </Group>
-    </UnstyledButton>
   );
 }
