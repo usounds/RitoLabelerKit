@@ -297,11 +297,12 @@ function startJetstream() {
                         const regex = new RegExp(postRule.condition);
                         if (regex.test(text)) {
                             // ラベルを適用する処理
-                            logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey}. action:${postRule.action}`);
                             if (postRule.appliedTo === 'account') {
+                            logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey} and target account. action:${postRule.action}`);
                                 if (!postRule.action) return
                                 await applyLabelForUser(event.did, [postRule.label], postRule.action, postRule.durationInHours)
                             } else if (postRule.appliedTo === 'post') {
+                            logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey} and target post.`);
                                 const aturi = `at://${event.did}/app.bsky.feed.post/${event.commit.rkey}`
                                 await applyLabelForPost(aturi, event.commit.cid, [postRule.label], 'add', postRule.durationInHours)
                             }
