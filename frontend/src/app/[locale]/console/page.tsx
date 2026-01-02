@@ -9,6 +9,7 @@ import { Container, Group, Loader, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { AppBskyLabelerService, } from '@atcute/bluesky';
 import semver from 'semver'
 type Did = `did:plc:${string}` | `did:web:${string}`;
 
@@ -24,6 +25,7 @@ export default function Console() {
     const setAutoLabelingJetstreamCursor = useManageStore(state => state.setAutoLabelingJetstreamCursor);
     const setAutoLabelingQueueCursor = useManageStore(state => state.setAutoLabelingQueueCursor);
     const setServiceEndpoint = useManageStore(state => state.setServiceEndpoint);
+    const setLabelerDef = useManageStore(state => state.setLabelerDef);
     const userProf = useXrpcAgentStore(state => state.userProf);
     const activeDid = useXrpcAgentStore(state => state.activeDid);
     const thisClient = useXrpcAgentStore(state => state.thisClient);
@@ -46,7 +48,6 @@ export default function Console() {
             );
 
             if (method && service) {
-                setMode('manage');
                 try {
                     const result = await fetch(`${service.serviceEndpoint}/xrpc/_health`)
                     const body = await result.json() as { version: string }
@@ -76,6 +77,20 @@ export default function Console() {
 
                     setServiceEndpoint(`https://${domain}`)
 
+
+                    try {
+                        const getRecord = await fetch(`https://${domain}/xrpc/blue.rito.label.getSetting?nsid=app.bsky.labeler.service`)
+
+                        if (getRecord.ok) {
+                            const records = await getRecord.json() as unknown as AppBskyLabelerService.Main;
+                            console.log(records)
+                            setLabelerDef(records);
+                        }
+                    } catch {
+                        return
+                    }
+
+                    setMode('manage');
                     const result2 = await fetch(`https://${domain}/xrpc/blue.rito.label.auto.getServiceStatus`)
 
                     const resultbody = await result2.json() as BlueRitoLabelAutoGetServiceStatus.$output
@@ -93,9 +108,11 @@ export default function Console() {
                         });
                     }
 
+
                 } catch {
 
                 }
+
             } else {
                 setMode('initial');
             }

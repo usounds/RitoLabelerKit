@@ -7,7 +7,6 @@ import { BlueRitoLabelAutoLikeSettings } from '@/lexicons/index';
 import { isPlcOrWebDid } from '@/lib/HandleAgent';
 import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManageStore } from "@/lib/ManageStore";
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
-import { AppBskyLabelerService, } from '@atcute/bluesky';
 import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
 import { Alert, Button, Group, SimpleGrid, Tabs } from '@mantine/core';
 import { Cog, FilePenLine, Heart, MessageCircleWarning, Tag } from 'lucide-react';
@@ -22,7 +21,6 @@ export default function Manage() {
     const activeDid = useXrpcAgentStore(state => state.activeDid);
     const setLike = useManageStore(state => state.setLike);
     const setPost = useManageStore(state => state.setPost);
-    const setLabelerDef = useManageStore(state => state.setLabelerDef);
     const setLikeSettings = useManageStore(state => state.setLikeSettings);
     const autoLabelingCursor = useManageStore(state => state.autoLabelingJetstreamCursor);
     const autoLabelingQueueCursor = useManageStore(state => state.autoLabelingQueueCursor);
@@ -63,18 +61,6 @@ export default function Manage() {
 
         if (!isPlcOrWebDid(activeDid)) return
         const handleOnLoad = async () => {
-            try {
-                 const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.getSetting?nsid=app.bsky.labeler.service`)
-
-                if (getRecord.ok) {
-                    const records = await getRecord.json() as unknown as AppBskyLabelerService.Main;
-                    console.log(records)
-                    setLabelerDef(records);
-                }
-            } catch {
-                return
-            }
-
 
             const getLikeSettings = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.getSetting?nsid=blue.rito.label.auto.like.settings`)
 
