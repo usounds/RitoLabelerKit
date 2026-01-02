@@ -1,15 +1,14 @@
 "use client"
 import Ininital from '@/components/Ininital';
 import Manage from '@/components/Manage';
-import { didDocumentResolver, isPlcOrWebDid } from '@/lib/HandleAgent';
+import { BlueRitoLabelAutoGetServiceStatus } from '@/lexicons';
+import { didDocumentResolver } from '@/lib/HandleAgent';
 import { useManageStore } from "@/lib/ManageStore";
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { Container, Group, Loader, Text } from '@mantine/core';
-import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { notifications } from '@mantine/notifications';
-import { BlueRitoLabelAutoGetServiceStatus } from '@/lexicons';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 type Did = `did:plc:${string}` | `did:web:${string}`;
 
 export function isDid(value: string): value is Did {

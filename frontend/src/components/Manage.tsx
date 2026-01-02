@@ -203,16 +203,21 @@ export default function Manage() {
 
             <Tabs.Panel value="settings">
                 <SimpleGrid cols={2} spacing="md">
-                    <DelayStatusCard
-                        from={autoLabelingCursor || new Date()}
-                        to={new Date()}
-                        title={t('settings.field.delay.title')}
-                    />
-                    <DelayStatusCard
-                        from={autoLabelingQueueCursor || new Date()}
-                        to={autoLabelingCursor || new Date()}
-                        title={t('settings.field.delay.queue')}
-                    />
+                    {autoLabelingCursor &&
+                        <DelayStatusCard
+                            from={autoLabelingCursor}
+                            to={new Date()}
+                            title={t('settings.field.delay.title')}
+                        />
+                    }
+
+                    {(autoLabelingCursor && autoLabelingQueueCursor) &&
+                        <DelayStatusCard
+                            from={autoLabelingQueueCursor}
+                            to={autoLabelingCursor}
+                            title={t('settings.field.delay.queue')}
+                        />
+                    }
                 </SimpleGrid>
 
                 <Group
