@@ -342,6 +342,8 @@ export default function Edit({
                 label={t('field.key.title')}
                 description={t('field.key.description')}
                 placeholder={t('field.key.placeholder')}
+                autoCapitalize="none"
+                autoComplete="off"
                 {...form.getInputProps('key')}
                 styles={{ input: { fontSize: 16 } }}
                 maxLength={15}
@@ -353,6 +355,8 @@ export default function Edit({
                 label={t('field.title.title')}
                 description={t('field.title.description')}
                 placeholder={t('field.title.placeholder')}
+                autoCapitalize="none"
+                autoComplete="off"
                 maxLength={50}
                 styles={{ input: { fontSize: 16 } }}
                 required
@@ -363,6 +367,8 @@ export default function Edit({
                 label={t('field.description.title')}
                 description={t('field.description.description')}
                 placeholder={t('field.description.placeholder')}
+                autoCapitalize="none"
+                autoComplete="off"
                 maxLength={255}
                 required
                 styles={{ input: { fontSize: 16 } }}
