@@ -4,12 +4,11 @@ import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { Client } from '@atcute/client';
 import { isDid } from '@atcute/lexicons/syntax';
 import { OAuthUserAgent, getSession } from '@atcute/oauth-browser-client';
-import { Group, useMantineTheme, Avatar, HoverCard } from '@mantine/core';
-import NextImage from 'next/image'
+import { Avatar, Group, useMantineTheme } from '@mantine/core';
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import NextImage from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from "react";
 import classes from './Header.module.css';
 
