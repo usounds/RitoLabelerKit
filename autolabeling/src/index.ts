@@ -193,6 +193,7 @@ function handlePreferenceDeleteEventWrapper(event:
     if (process.env.LABELER_DID === event.did) {
         enqueue(async () => {
             try {
+                logger.info(`Preference deleted ${event.commit.collection}`)
                 deletePreference(event.commit.collection)
             } catch (e) {
                 logger.error(e)
