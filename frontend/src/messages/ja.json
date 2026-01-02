@@ -125,9 +125,7 @@
                         "description": "一部のクライアントで表示されます。後から変更できません",
                         "placeholder": "birthday",
                         "required": "英語名は必須です",
-                        "noNumbersOnly": "数字のみは不可です",
-                        "noSpaces": "スペースは不可です",
-                        "noFullWidth": "全角文字は不可です"
+                        "validate": "使用できるのは、半角の英語小文字とハイフンのみです"
                     },
                     "title": {
                         "title": "タイトル",

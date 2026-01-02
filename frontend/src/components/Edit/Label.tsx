@@ -323,9 +323,12 @@ export default function Edit({
         validate: {
             key: (v) => {
                 if (!v) return t('field.key.required');
-                if (/^\d+$/.test(v)) return t('field.key.noNumbersOnly'); // 数字だけ
-                if (/\s/.test(v)) return t('field.key.noSpaces');          // 空白含む
-                if (/[^\x00-\x7F]/.test(v)) return t('field.key.noFullWidth'); // 全角含む
+
+                // 小文字 a-z と - のみ許可
+                if (!/^[a-z-]+$/.test(v)) {
+                    return t('field.key.validate');
+                }
+
                 return null;
             },
             name: (v) => (!v ? t('field.title.required') : null),
@@ -342,6 +345,7 @@ export default function Edit({
                 {...form.getInputProps('key')}
                 styles={{ input: { fontSize: 16 } }}
                 maxLength={15}
+                required
                 disabled={!!keyLocal}
             />
 
