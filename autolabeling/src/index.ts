@@ -1,25 +1,22 @@
+import { serve } from '@hono/node-server';
 import { CommitCreateEvent, CommitDeleteEvent, CommitUpdateEvent, Jetstream } from '@skyware/jetstream';
 import 'dotenv/config';
+import { Hono } from 'hono';
 import PQueue from 'p-queue';
 import WebSocket from 'ws';
 import type { } from './lexicons/index.js';
-import { applyLabelForUser, applyLabelForPost } from './lib/atcute.js';
+import { applyLabelForPost, applyLabelForUser } from './lib/atcute.js';
 import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, upsertLike, upsertLikeSubject, upsertPost } from './lib/db.js';
 import logger from './lib/logger.js';
 import { LikeRecord, LikeSubjectRecord, memoryDB, PostRecord } from './lib/type.js';
-import { Hono } from 'hono';
-import { serve } from '@hono/node-server';
-
 import cursorPkg from '../package.json' with { type: 'json' };
 
 // キュー設定
 const queue = new PQueue({ concurrency: 1 });
-const QUEUE_WARN = 2000;
-const QUEUE_DROP = 20000;
+const QUEUE_WARN = Number(process.env.QUEUE_WARN ?? 2000);
+const QUEUE_DROP = Number(process.env.QUEUE_DROP ?? 20000);
 let warned = false;
 let overflowed = false;
-
-// キューの閾値
 function enqueue(task: () => Promise<void>) {
     // DROP 超過
     if (queue.size > QUEUE_DROP) {
@@ -48,9 +45,6 @@ function enqueue(task: () => Promise<void>) {
         logger.error(err, 'Queue task failed');
     });
 }
-
-
-const port = parseInt(process.env.PORT || '8080');
 
 
 if (process.env.LABELER_DID === 'DUMMY') {
@@ -519,11 +513,11 @@ process.on('SIGINT', () => {
 });
 
 
-// xrpc endpoint
+// Heath
+const port = parseInt(process.env.PORT || '8080');
+
 const app = new Hono();
 app.get('/', c => c.text('OK'));
-
-
 app.get('/xrpc/blue.rito.label.auto.getServiceStatus', (c) => {
     return c.json({
         version: cursorPkg.version,
@@ -536,3 +530,5 @@ serve({
     fetch: app.fetch,
     port,
 });
+
+logger.info(`Running xrpc end points at:${port}`);
