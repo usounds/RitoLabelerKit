@@ -21,32 +21,32 @@ let overflowed = false;
 
 // キューの閾値
 function enqueue(task: () => Promise<void>) {
-  // DROP 超過
-  if (queue.size > QUEUE_DROP) {
-    if (!overflowed) {
-      logger.error(`Queue overflow: size=${queue.size}, dropping tasks`);
-      overflowed = true;
+    // DROP 超過
+    if (queue.size > QUEUE_DROP) {
+        if (!overflowed) {
+            logger.error(`Queue overflow: size=${queue.size}, dropping tasks`);
+            overflowed = true;
+        }
+        return;
+    } else {
+        // 回復したらリセット
+        overflowed = false;
     }
-    return;
-  } else {
-    // 回復したらリセット
-    overflowed = false;
-  }
 
-  // WARN 超過
-  if (queue.size > QUEUE_WARN) {
-    if (!warned) {
-      logger.warn(`Queue growing: size=${queue.size}`);
-      warned = true;
+    // WARN 超過
+    if (queue.size > QUEUE_WARN) {
+        if (!warned) {
+            logger.warn(`Queue growing: size=${queue.size}`);
+            warned = true;
+        }
+    } else {
+        // 回復したらリセット
+        warned = false;
     }
-  } else {
-    // 回復したらリセット
-    warned = false;
-  }
 
-  queue.add(task).catch(err => {
-    logger.error(err, 'Queue task failed');
-  });
+    queue.add(task).catch(err => {
+        logger.error(err, 'Queue task failed');
+    });
 }
 
 
@@ -214,19 +214,22 @@ function startJetstream() {
         return;
     }
 
-    // 新しいインスタンスを作成
-    jetstream = new Jetstream({
-        wantedCollections: [
-            'app.bsky.feed.post',
-            'app.bsky.feed.like',
-            'blue.rito.label.auto.like',
-            'blue.rito.label.auto.post',
-            'blue.rito.label.auto.random'
-        ],
-        endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
-        cursor: jetstreamCursor,
-        ws: WebSocket,
-    });
+
+    if (!jetstream) {
+        // 新しいインスタンスを作成
+        jetstream = new Jetstream({
+            wantedCollections: [
+                'app.bsky.feed.post',
+                'app.bsky.feed.like',
+                'blue.rito.label.auto.like',
+                'blue.rito.label.auto.post',
+                'blue.rito.label.auto.random'
+            ],
+            endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
+            cursor: jetstreamCursor,
+            ws: WebSocket,
+        });
+    }
 
     // 接続成功
     jetstream.on('connected', () => {
@@ -385,7 +388,7 @@ function startJetstream() {
                 const likeUri = `at://${event.did}/app.bsky.feed.like/${event.commit.rkey}`;
                 const likeSubjectUri = (event.commit.record as any).subject.uri; // Like された投稿の URI
 
-                
+
 
                 // memoryDB.likes の投稿に Like がついた場合のみ処理
                 const targetPost = memoryDB.likes.find(like => like.subject === likeSubjectUri);
@@ -501,14 +504,14 @@ app.get('/', c => c.text('OK'));
 
 
 app.get('/xrpc/blue.rito.label.auto.getServiceStatus', (c) => {
-  return c.json({
-    version: cursorPkg.version,
-    jetstreamCursor: new Date(jetstreamCursor / 1000).toISOString(),
-    queueCursor: new Date(queueCursor / 1000).toISOString(),
-  });
+    return c.json({
+        version: cursorPkg.version,
+        jetstreamCursor: new Date(jetstreamCursor / 1000).toISOString(),
+        queueCursor: new Date(queueCursor / 1000).toISOString(),
+    });
 });
 
 serve({
-  fetch: app.fetch,
-  port,
+    fetch: app.fetch,
+    port,
 });
