@@ -463,11 +463,27 @@ function startJetstream() {
                 logger.error('Failed to save cursor to DB');
             }
 
+            prev_time_us = jetstream.cursor; 
             if (prev_time_us === jetstream.cursor) {
                 logger.info(`The time_us has not changed since the last check, reconnecting.`);
                 jetstream.close();
+
+                jetstream = null
+
+                jetstream = new Jetstream({
+                    wantedCollections: [
+                        'app.bsky.feed.post',
+                        'app.bsky.feed.like',
+                        'blue.rito.label.auto.like',
+                        'blue.rito.label.auto.post',
+                        'blue.rito.label.auto.random'
+                    ],
+                    endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
+                    cursor: jetstreamCursor,
+                    ws: WebSocket,
+                });
+
             }
-            prev_time_us = jetstream.cursor;
         }
     }, intervalMs);
 }
