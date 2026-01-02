@@ -62,7 +62,7 @@ export default function PostForm({
     initialValues: {
       label: prev?.label || '',
       appliedTo: (prev?.appliedTo || 'account') as AppliedTo,
-      condition: prev?.condition || '@'+userProf?.handle+' ',
+      condition: prev?.condition || '@' + userProf?.handle + ' ',
       durationInHours: prev?.durationInHours || 0,
       action: 'add',
     },
@@ -70,13 +70,13 @@ export default function PostForm({
       label: (v) => (!v ? 'Required' : null),
       condition: (v) => {
         if (!v) return 'Required';
-        if(v.length<8) return t('field.condition.message.length')
-        if(form.values.appliedTo==='account' && !v.includes(userProf?.handle||'')) return t('field.condition.message.mustmention')
-        if(form.values.appliedTo==='post' && !v.includes('#')) return t('field.condition.message.musthashtag')
+        if (v.length < 8) return t('field.condition.message.length')
+        if (form.values.appliedTo === 'account' && !v.includes(userProf?.handle || '')) return t('field.condition.message.mustmention')
+        if (form.values.appliedTo === 'post' && !v.includes('#')) return t('field.condition.message.musthashtag')
         try {
           new RegExp(v);
           return null; // 正しい正規表現
-        } catch  {
+        } catch {
           return 'Invalid regular expression';
         }
       },
@@ -205,6 +205,9 @@ export default function PostForm({
           label={t('field.label.title')}
           description={t('field.label.description')}
           data={labelOptions}
+          autoCapitalize="none"
+          autoCorrect="off"
+          autoComplete="off"
           styles={{ input: { fontSize: 16 } }}
           {...form.getInputProps('label')}
         />
@@ -226,6 +229,8 @@ export default function PostForm({
           label={t('field.condition.title')}
           description={t('field.condition.description')}
           placeholder={t('field.condition.placeholder')}
+          autoCapitalize="none"
+          autoComplete="off"
           autosize
           minRows={2}
           minLength={10}
