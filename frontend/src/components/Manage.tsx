@@ -1,20 +1,19 @@
 "use client"
+import { DelayStatusCard } from '@/components/DelayStatusCard';
 import { TableScrollArea } from "@/components/LabelTable/Table";
 import Like from "@/components/Tab/Like";
 import Post from "@/components/Tab/Post";
-import { BlueRitoLabelAutoLike, BlueRitoLabelAutoLikeSettings, BlueRitoLabelAutoPost } from '@/lexicons/index';
+import { BlueRitoLabelAutoLikeSettings } from '@/lexicons/index';
 import { isPlcOrWebDid } from '@/lib/HandleAgent';
 import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManageStore } from "@/lib/ManageStore";
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { AppBskyLabelerService, } from '@atcute/bluesky';
 import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
-import { Alert, Button, Group, Tabs, SimpleGrid } from '@mantine/core';
-import { Cog, FilePenLine, Heart, Tag } from 'lucide-react';
+import { Alert, Button, Group, SimpleGrid, Tabs } from '@mantine/core';
+import { Cog, FilePenLine, Heart, MessageCircleWarning, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { MessageCircleWarning } from 'lucide-react';
-import { DelayStatusCard } from '@/components/DelayStatusCard';
 
 
 export default function Manage() {
