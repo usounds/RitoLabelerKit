@@ -9,6 +9,7 @@ import { Container, Group, Loader, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import semver from 'semver'
 type Did = `did:plc:${string}` | `did:web:${string}`;
 
 export function isDid(value: string): value is Did {
@@ -80,7 +81,7 @@ export default function Console() {
                     setAutoLabelingJetstreamCursor(new Date(resultbody.jetstreamCursor))
                     setAutoLabelingQueueCursor(new Date(resultbody.queueCursor))
 
-                    if (resultbody.version <= '0.1.2') {
+                    if (semver.lte(resultbody.version, '0.1.2')) {
                         notifications.show({
                             id: 'login-process',
                             title: t('title'),

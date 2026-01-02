@@ -51,5 +51,5 @@ export const useManageStore = create<ManageStore>((set) => ({
   setLabelerVersion: (labelerVersion) => set({ labelerVersion }),
   setAutoLabelingVersion: (autoLabelingVersion) => set({ autoLabelingVersion }),
   setAutoLabelingJetstreamCursor: (autoLabelingJetstreamCursor) => set({ autoLabelingJetstreamCursor: autoLabelingJetstreamCursor }),
-  setAutoLabelingQueueCursor: (autoLabelingQueueCursor) => set({ autoLabelingJetstreamCursor: autoLabelingQueueCursor }),
+  setAutoLabelingQueueCursor: (autoLabelingQueueCursor) => set({ autoLabelingQueueCursor: autoLabelingQueueCursor }),
 }))

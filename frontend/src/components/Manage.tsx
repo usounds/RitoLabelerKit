@@ -172,6 +172,9 @@ export default function Manage() {
         return
     }
 
+    const isValidDate = (d: Date | null) =>
+        d instanceof Date && !isNaN(d.getTime());
+
     return (
         <Tabs defaultValue="label">
             <Tabs.List>
@@ -203,30 +206,31 @@ export default function Manage() {
 
             <Tabs.Panel value="settings">
                 <SimpleGrid cols={2} spacing="md">
-                    {autoLabelingCursor !== null &&
+                    {isValidDate(autoLabelingCursor) && (
                         <DelayStatusCard
-                            from={autoLabelingCursor}
+                            from={autoLabelingCursor!}
                             to={new Date()}
                             title={t('settings.field.delay.title')}
                         />
-                    }
+                    )}
 
-                    {(autoLabelingCursor && autoLabelingQueueCursor) &&
+                    {isValidDate(autoLabelingCursor) && isValidDate(autoLabelingQueueCursor) && (
                         <DelayStatusCard
-                            from={autoLabelingQueueCursor}
-                            to={autoLabelingCursor}
+                            from={autoLabelingQueueCursor!}
+                            to={autoLabelingCursor!}
                             title={t('settings.field.delay.queue')}
                         />
-                    }
-
+                    )}
                 </SimpleGrid>
-                <Group
-                    align="center"        // 垂直方向の中央揃え
-                    style={{ justifyContent: 'center' }} // 横方向の中央揃え
-                    mt="sm"
-                >
-                    <Alert variant="light" color='red' icon={<MessageCircleWarning />}>{t('settings.inform.serverdown')}</Alert>
-                </Group>
+                {(!isValidDate(autoLabelingCursor) || !isValidDate(autoLabelingQueueCursor)) &&
+                    <Group
+                        align="center"        // 垂直方向の中央揃え
+                        style={{ justifyContent: 'center' }} // 横方向の中央揃え
+                        mt="sm"
+                    >
+                        <Alert variant="light" color='red' icon={<MessageCircleWarning />}>{t('settings.inform.serverdown')}</Alert>
+                    </Group>
+                }
 
                 <Group
                     align="center"        // 垂直方向の中央揃え
