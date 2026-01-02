@@ -230,7 +230,7 @@ export default function Inital({ userProf }: InitalProps) {
 
     return (
         <>
-            <Stepper active={active} onStepClick={setActive}>
+            <Stepper active={active}>
 
                 {/* 左寄せ */}
                 <Stepper.Step
