@@ -2,7 +2,7 @@ Rito Labeler Kit are tool kit for Bluesky Labeler.
 
 # Rito Labeler Kit
 
-Plase deploy Rito Labeler Kit to Railway.
+Please deploy Rito Labeler Kit to Railway.
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/YHPVnN?referralCode=Nd-OAk)
 
