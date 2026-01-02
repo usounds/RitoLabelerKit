@@ -463,7 +463,6 @@ function startJetstream() {
                 logger.error('Failed to save cursor to DB');
             }
 
-            prev_time_us = jetstream.cursor; 
             if (prev_time_us === jetstream.cursor) {
                 logger.info(`The time_us has not changed since the last check, reconnecting.`);
                 jetstream.close();
@@ -483,7 +482,13 @@ function startJetstream() {
                     ws: WebSocket,
                 });
 
+                startJetstream() 
+
+            } else {
+                prev_time_us = jetstream.cursor;
+
             }
+
         }
     }, intervalMs);
 }
