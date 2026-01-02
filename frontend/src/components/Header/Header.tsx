@@ -5,7 +5,7 @@ import { Client } from '@atcute/client';
 import { isDid } from '@atcute/lexicons/syntax';
 import { OAuthUserAgent, getSession } from '@atcute/oauth-browser-client';
 import { Group, useMantineTheme, Avatar, HoverCard } from '@mantine/core';
-import { Tags } from 'lucide-react';
+import NextImage from 'next/image'
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -88,8 +88,8 @@ export default function Header() {
   return (
     <header className={classes.header}>
       <div className={classes.inner}>
-        <Group gap="sm">
-          <Tags color={theme.colors.blue[6]} />
+        <Group gap="xs">
+          <NextImage src='/favicon.png' width={20} height={20} alt="icon"/>
           <Link href="/" className={classes.link}>
             Rito Labeler Console
           </Link>
