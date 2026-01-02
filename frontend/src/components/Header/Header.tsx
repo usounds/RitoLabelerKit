@@ -17,7 +17,6 @@ const links = [
 ];
 
 export default function Header() {
-  const theme = useMantineTheme();
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();

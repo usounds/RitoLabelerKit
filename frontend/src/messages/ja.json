@@ -186,7 +186,8 @@
                         "description": "このポストの本文に反応します。",
                         "placeholder": "@label.rito.blue 戌のラベルを貼って",
                         "message":{
-                            "length" : "条件は10文字以上必要です",
+                            "length" : "条件は8文字以上必要です",
+                            "musthashtag" : "ハッシュタグが必要です",
                             "mustmention" : "ラベラーアカウントのメンションが必須です"
                         }
                     },

@@ -70,8 +70,9 @@ export default function PostForm({
       label: (v) => (!v ? 'Required' : null),
       condition: (v) => {
         if (!v) return 'Required';
-        if(v.length<=10) return t('field.condition.message.length')
-        if(!v.includes(userProf?.handle||'')) return t('field.condition.message.mustmention')
+        if(v.length<8) return t('field.condition.message.length')
+        if(form.values.appliedTo==='account' && !v.includes(userProf?.handle||'')) return t('field.condition.message.mustmention')
+        if(form.values.appliedTo==='post' && !v.includes('#')) return t('field.condition.message.musthashtag')
         try {
           new RegExp(v);
           return null; // 正しい正規表現
