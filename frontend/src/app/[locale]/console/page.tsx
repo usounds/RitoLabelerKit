@@ -23,6 +23,7 @@ export default function Console() {
     const setAutoLabelingVersion = useManageStore(state => state.setAutoLabelingVersion);
     const setAutoLabelingJetstreamCursor = useManageStore(state => state.setAutoLabelingJetstreamCursor);
     const setAutoLabelingQueueCursor = useManageStore(state => state.setAutoLabelingQueueCursor);
+    const setServiceEndpoint = useManageStore(state => state.setServiceEndpoint);
     const userProf = useXrpcAgentStore(state => state.userProf);
     const activeDid = useXrpcAgentStore(state => state.activeDid);
     const thisClient = useXrpcAgentStore(state => state.thisClient);
@@ -72,6 +73,8 @@ export default function Console() {
                             domain = new URL(urlString).hostname;
                         }
                     }
+
+                    setServiceEndpoint(`https://${domain}`)
 
                     const result2 = await fetch(`https://${domain}/xrpc/blue.rito.label.auto.getServiceStatus`)
 

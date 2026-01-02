@@ -52,6 +52,50 @@ db.prepare(`
   )
 `).run();
 
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS preference_records (
+    nsid TEXT PRIMARY KEY,
+    value TEXT
+  )
+`).run();
+
+
+/**
+ * preference を取得
+ * 存在しない場合は null を返す
+ */
+export function getPreference(nsid: string): string | null {
+  const stmt = db.prepare(
+    'SELECT value FROM preference_records WHERE nsid = ?'
+  );
+
+  const row = stmt.get(nsid) as { value: string } | undefined;
+  return row ? row.value : null;
+}
+
+
+/**
+ * preference を保存
+ */
+export function setPreference(nsid: string, value: string): void {
+  db.prepare(`
+    INSERT INTO preference_records (nsid, value)
+    VALUES (?, ?)
+    ON CONFLICT(nsid)
+    DO UPDATE SET value = excluded.value
+  `).run(nsid, value);
+}
+
+/**
+ * preference を削除
+ */
+export function deletePreference(nsid: string): void {
+  db.prepare(`
+    DELETE FROM preference_records
+    WHERE nsid = ?
+  `).run(nsid);
+}
+
 // --- Cursor ---
 export function getCursor(): number {
   const stmt = db.prepare('SELECT value FROM cursor WHERE name = ?');

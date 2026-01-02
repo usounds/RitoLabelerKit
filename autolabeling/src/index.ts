@@ -6,7 +6,7 @@ import PQueue from 'p-queue';
 import WebSocket from 'ws';
 import type { } from './lexicons/index.js';
 import { applyLabelForPost, applyLabelForUser } from './lib/atcute.js';
-import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, upsertLike, upsertLikeSubject, upsertPost } from './lib/db.js';
+import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, upsertLike, upsertLikeSubject, upsertPost, getPreference, setPreference,deletePreference } from './lib/db.js';
 import logger from './lib/logger.js';
 import { LikeRecord, LikeSubjectRecord, memoryDB, PostRecord } from './lib/type.js';
 import cursorPkg from '../package.json' with { type: 'json' };
@@ -159,6 +159,49 @@ function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.p
         });
     }
 }
+
+
+// 共通処理
+function handlePreferenceEventWrapper(event: 
+    CommitCreateEvent<'app.bsky.labeler.service'> |
+    CommitUpdateEvent<'app.bsky.labeler.service'> |
+    CommitCreateEvent<'blue.rito.label.auto.like.settings'> |
+    CommitUpdateEvent<'blue.rito.label.auto.like.settings'> 
+
+) {
+    jetstreamCursor = event.time_us;
+
+    if (process.env.LABELER_DID === event.did) {
+        enqueue(async () => {
+            try {
+                logger.info(`Preference Upserted ${event.commit.collection}`)
+                setPreference(event.commit.collection, JSON.stringify(event.commit.record))
+            } catch (e) {
+                logger.error(e)
+
+            }
+        });
+    }
+}
+function handlePreferenceDeleteEventWrapper(event: 
+    CommitDeleteEvent<'app.bsky.labeler.service'> |
+    CommitDeleteEvent<'blue.rito.label.auto.like.settings'> 
+
+) {
+    jetstreamCursor = event.time_us;
+
+    if (process.env.LABELER_DID === event.did) {
+        enqueue(async () => {
+            try {
+                deletePreference(event.commit.collection)
+            } catch (e) {
+                logger.error(e)
+
+            }
+        });
+    }
+}
+
 let jetstream: Jetstream | null = null;
 let reconnectTimer: NodeJS.Timeout | null = null;
 let connecting = false;
@@ -215,7 +258,9 @@ function startJetstream() {
             wantedCollections: [
                 'app.bsky.feed.post',
                 'app.bsky.feed.like',
+                'app.bsky.labeler.service',
                 'blue.rito.label.auto.like',
+                'blue.rito.label.auto.like.settings',
                 'blue.rito.label.auto.post',
                 'blue.rito.label.auto.random'
             ],
@@ -259,6 +304,12 @@ function startJetstream() {
     // Create / Update 共通化
     jetstream.onCreate('blue.rito.label.auto.post', handlePostEventWrapper);
     jetstream.onUpdate('blue.rito.label.auto.post', handlePostEventWrapper);
+    jetstream.onCreate('blue.rito.label.auto.like.settings', handlePreferenceEventWrapper);
+    jetstream.onUpdate('blue.rito.label.auto.like.settings', handlePreferenceEventWrapper);
+    jetstream.onCreate('app.bsky.labeler.service', handlePreferenceEventWrapper);
+    jetstream.onUpdate('app.bsky.labeler.service', handlePreferenceEventWrapper);
+    jetstream.onDelete('blue.rito.label.auto.like.settings', handlePreferenceDeleteEventWrapper);
+    jetstream.onDelete('app.bsky.labeler.service', handlePreferenceDeleteEventWrapper);
 
     jetstream.onDelete('blue.rito.label.auto.post', (event: CommitDeleteEvent<'blue.rito.label.auto.post'>) => {
         jetstreamCursor = event.time_us;
@@ -525,6 +576,34 @@ app.get('/xrpc/blue.rito.label.auto.getServiceStatus', (c) => {
         jetstreamCursor: new Date(jetstreamCursor / 1000).toISOString(),
         queueCursor: new Date(queueCursor / 1000).toISOString(),
     });
+});
+app.get('/xrpc/blue.rito.label.auto.like.getSettings', (c) => {
+    return c.json(memoryDB.likes);
+});
+
+app.get('/xrpc/blue.rito.label.auto.post.getSettings', (c) => {
+    return c.json(memoryDB.posts);
+});
+
+
+app.get('/xrpc/blue.rito.label.getSetting', (c) => {
+  const nsid = c.req.query('nsid');
+
+  if (!nsid) {
+    return c.json(
+      { error: 'nsid query parameter is required' },
+      400
+    );
+  }
+
+  const value = getPreference(nsid);
+
+  try {
+    return c.json(JSON.parse(value||''));
+  } catch {
+    // 万一 JSON でなかった場合のフォールバック
+    return c.json(value);
+  }
 });
 
 serve({

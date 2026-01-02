@@ -27,6 +27,7 @@ export default function Manage() {
     const setLikeSettings = useManageStore(state => state.setLikeSettings);
     const autoLabelingCursor = useManageStore(state => state.autoLabelingJetstreamCursor);
     const autoLabelingQueueCursor = useManageStore(state => state.autoLabelingQueueCursor);
+    const serviceEndpoint = useManageStore(state => state.serviceEndpoint);
     const setUseLike = useManageStore(state => state.setUseLike);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -35,111 +36,53 @@ export default function Manage() {
     const setActiveDid = useXrpcAgentStore(state => state.setActiveDid);
 
     async function fetchAllLikes(): Promise<BlueRitoLabelAutoLikeWithRkey[]> {
-        const result: BlueRitoLabelAutoLikeWithRkey[] = [];
-        let cursor: string = '';
         if (!activeDid) return []
+        if (!serviceEndpoint) return []
         if (!isPlcOrWebDid(activeDid)) return []
 
-        do {
-            const getRecord = await thisClient.get("com.atproto.repo.listRecords", {
-                params: {
-                    repo: activeDid,
-                    collection: "blue.rito.label.auto.like",
-                    limit: 100,
-                    cursor,
-                }
-            });
-
-            if (!getRecord.ok) break;
-
-            const records = getRecord.data.records;
-            for (const r of records) {
-                const value = r.value as BlueRitoLabelAutoLike.Main;
-                // rkey はここで uri から作る or 任意に設定
-                const rkey = r.uri.split("/").pop() ?? "unknown";
-
-                result.push({
-                    ...value,
-                    rkey,
-                });
-            }
-
-            cursor = getRecord.data.cursor ?? '';
-        } while (cursor);
-
-        return result;
+            const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.auto.like.getSettings`)
+            const records = getRecord.json() as unknown as BlueRitoLabelAutoLikeWithRkey[];
+        return records;
     }
 
     async function fetchAllPosts(): Promise<BlueRitoLabelAutoPostWithRkey[]> {
-        const result: BlueRitoLabelAutoPostWithRkey[] = [];
-        let cursor: string = '';
         if (!activeDid) return []
+        if (!serviceEndpoint) return []
         if (!isPlcOrWebDid(activeDid)) return []
 
-        do {
-            const getRecord = await thisClient.get("com.atproto.repo.listRecords", {
-                params: {
-                    repo: activeDid,
-                    collection: "blue.rito.label.auto.post",
-                    limit: 100,
-                    cursor,
-                }
-            });
 
-            if (!getRecord.ok) break;
+            const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.auto.post.getSettings`)
+            const records = getRecord.json() as unknown as BlueRitoLabelAutoPostWithRkey[];
 
-            const records = getRecord.data.records;
-            for (const r of records) {
-                const value = r.value as BlueRitoLabelAutoPost.Main;
-                // rkey はここで uri から作る or 任意に設定
-                const rkey = r.uri.split("/").pop() ?? "unknown";
-
-                result.push({
-                    ...value,
-                    rkey,
-                });
-            }
-
-            cursor = getRecord.data.cursor ?? '';
-        } while (cursor);
-
-        return result;
+        return records;
     }
 
     useEffect(() => {
-        if (!activeDid || !thisClient) {
+        if (!activeDid || !thisClient || !serviceEndpoint) {
             return
         }
 
         if (!isPlcOrWebDid(activeDid)) return
         const handleOnLoad = async () => {
             try {
-                const getRecord = await thisClient.get("com.atproto.repo.getRecord", {
-                    params: {
-                        repo: activeDid,
-                        collection: "app.bsky.labeler.service",
-                        rkey: 'self'
-                    },
-                    as: 'json' // 型によっては必須
-                });
+                 const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.getSetting?nsid=app.bsky.labeler.service`)
+
                 if (getRecord.ok) {
-                    setLabelerDef(getRecord.data.value as AppBskyLabelerService.Main);
+                    const records = await getRecord.json() as unknown as AppBskyLabelerService.Main;
+                    console.log(records)
+                    setLabelerDef(records);
                 }
             } catch {
                 return
             }
 
 
-            const getLikeSettings = await thisClient.get("com.atproto.repo.getRecord", {
-                params: {
-                    repo: activeDid,
-                    collection: "blue.rito.label.auto.like.settings",
-                    rkey: 'self'
-                },
-                as: 'json' // 型によっては必須
-            });
+            const getLikeSettings = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.getSetting?nsid=blue.rito.label.auto.like.settings`)
+
             if (getLikeSettings.ok) {
-                setLikeSettings(getLikeSettings.data.value as BlueRitoLabelAutoLikeSettings.Main);
+                const records = await getLikeSettings.json() as unknown as BlueRitoLabelAutoLikeSettings.Main;
+                setLikeSettings(records);
+                console.log(records)
                 setUseLike(true)
             }
 
@@ -151,7 +94,7 @@ export default function Manage() {
         }
 
         handleOnLoad()
-    }, [activeDid, thisClient]);
+    }, [activeDid, thisClient ,serviceEndpoint]);
 
     const logout = async () => {
         if (!activeDid) return

@@ -12,7 +12,7 @@
     }
     
     @autoLabeler {
-        path_regexp auto ^/xrpc/blue\.rito\.label\.auto\..*
+        path_regexp auto ^/xrpc/blue\.rito\.label\..*
     }
 
     # /xrpc/blue.rito.label.auto* を別ポートに転送
