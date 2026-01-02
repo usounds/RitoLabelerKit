@@ -46,7 +46,7 @@ function enqueue(task: () => Promise<void>) {
     });
 }
 
-
+// Jerstreamリスナー
 if (process.env.LABELER_DID === 'DUMMY') {
     logger.info(`This service need to more setup. Please go to the following site.`)
     logger.info(`https://label.rito.blue`)
@@ -513,7 +513,7 @@ process.on('SIGINT', () => {
 });
 
 
-// Heath
+// xrpc end point
 const port = parseInt(process.env.PORT || '8080');
 
 const app = new Hono();
