@@ -15,3 +15,8 @@ Labeler concole can the following process
 - Auto labeling condition settings( like based or post based )
 
 https://label.rito.blue
+
+
+# Thanks
+[Bluesky Labeler Starter Kit](https://github.com/aliceisjustplaying/labeler-starter-kit-bsky)
+[skyware](https://skyware.js.org/)
