@@ -69,23 +69,6 @@ export default function Console() {
                         }
                     }
 
-                    const result = await fetch(`https://${domain}/xrpc/_health`)
-                    const body = await result.json() as { version: string }
-                    if (body.version) {
-                        setLabelerVersion(body.version)
-                    } else {
-
-                        notifications.show({
-                            id: 'login-process',
-                            title: t('title'),
-                            color: "red",
-                            message: t('manage.message.notRunning', {
-                                domain: domain ?? 'unknown',
-                            }),
-                        });
-                    }
-
-
                     setServiceEndpoint(`https://${domain}`)
 
 
@@ -129,6 +112,25 @@ export default function Console() {
                             message: t('message.versionUp'),
                         });
                     }
+
+
+                    const result = await fetch(`https://${domain}/xrpc/_health`)
+                    const body = await result.json() as { version: string }
+                    if (body.version) {
+                        setLabelerVersion(body.version)
+                    } else {
+
+                        notifications.show({
+                            id: 'login-process',
+                            title: t('title'),
+                            color: "red",
+                            message: t('manage.message.notRunning', {
+                                domain: domain ?? 'unknown',
+                            }),
+                        });
+                    }
+
+
 
 
                 } catch {
