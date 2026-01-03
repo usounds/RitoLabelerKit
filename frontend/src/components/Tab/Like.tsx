@@ -139,6 +139,7 @@ export default function Like() {
                     text: diff.locales[0].name,
                     createdAt: now,
                     locale: [diff.locales[0]],
+                    "blue.rito.label.auto.like":diff.key,
                     reply: {
                         root: {
                             cid: likeSettingsLocal?.apply.cid,
@@ -156,16 +157,6 @@ export default function Like() {
 
             //}
 
-            writes.push({
-                $type: "com.atproto.repo.applyWrites#create" as const,
-                collection: "blue.rito.label.auto.like" as `${string}.${string}.${string}.${string}.${string}`,
-                rkey: diff.key,
-                value: {
-                    createdAt: now,
-                    subject: `at://${activeDid}/app.bsky.feed.post/${rkeyLocal}`
-
-                }
-            });
 
             likeLocal.push({
                 $type: "blue.rito.label.auto.like",
@@ -198,15 +189,8 @@ export default function Like() {
 
         // Like - Post
         for (const obj of like) {
-            writes.push({
-                $type: "com.atproto.repo.applyWrites#delete" as const,
-                collection: "blue.rito.label.auto.like" as `${string}.${string}.${string}.${string}.${string}`,
-                rkey: obj.rkey
-            });
             const rkey = obj.subject.split('/').pop()
             if (!rkey) return // or throw
-
-
             const postObj = {
                 $type: "com.atproto.repo.applyWrites#delete" as const,
                 collection: "app.bsky.feed.post" as `${string}.${string}.${string}.${string}.${string}`,

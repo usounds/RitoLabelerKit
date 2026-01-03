@@ -171,6 +171,7 @@ export default function Edit({
                     text: form.values.name,
                     createdAt: now,
                     locale: [locale],
+                    "blue.rito.label.auto.like":form.values.key,
                     reply: {
                         root: {
                             cid: likeSettings.apply.cid,

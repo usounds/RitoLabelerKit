@@ -5,8 +5,9 @@ import { Hono } from 'hono';
 import PQueue from 'p-queue';
 import WebSocket from 'ws';
 import type { } from './lexicons/index.js';
+import { AppBskyFeedPost, } from '@atcute/bluesky';
 import { applyLabelForPost, applyLabelForUser } from './lib/atcute.js';
-import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, upsertLike, upsertLikeSubject, upsertPost, getPreference, setPreference,deletePreference } from './lib/db.js';
+import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, upsertLike, upsertLikeSubject, upsertPost, getPreference, setPreference, deletePreference } from './lib/db.js';
 import logger from './lib/logger.js';
 import { LikeRecord, LikeSubjectRecord, memoryDB, PostRecord } from './lib/type.js';
 import cursorPkg from '../package.json' with { type: 'json' };
@@ -60,6 +61,8 @@ let jetstreamCursor = 0;
 let queueCursor = 0;
 let prev_time_us = 0
 let cursorUpdateInterval: NodeJS.Timeout;
+
+
 // 起動時にオンメモリにロード
 function loadMemoryDB() {
     // --- Like ---
@@ -79,8 +82,6 @@ function loadMemoryDB() {
 function epochUsToDateTime(cursor: number): string {
     return new Date(cursor / 1000).toISOString();
 }
-
-
 // Like自動ラベル
 function handleLikeEvent(rkey: string, record: { subject: string; createdAt: string }) {
     // DBに保存
@@ -162,11 +163,11 @@ function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.p
 
 
 // 共通処理
-function handlePreferenceEventWrapper(event: 
+function handlePreferenceEventWrapper(event:
     CommitCreateEvent<'app.bsky.labeler.service'> |
     CommitUpdateEvent<'app.bsky.labeler.service'> |
     CommitCreateEvent<'blue.rito.label.auto.like.settings'> |
-    CommitUpdateEvent<'blue.rito.label.auto.like.settings'> 
+    CommitUpdateEvent<'blue.rito.label.auto.like.settings'>
 
 ) {
     jetstreamCursor = event.time_us;
@@ -183,9 +184,9 @@ function handlePreferenceEventWrapper(event:
         });
     }
 }
-function handlePreferenceDeleteEventWrapper(event: 
+function handlePreferenceDeleteEventWrapper(event:
     CommitDeleteEvent<'app.bsky.labeler.service'> |
-    CommitDeleteEvent<'blue.rito.label.auto.like.settings'> 
+    CommitDeleteEvent<'blue.rito.label.auto.like.settings'>
 
 ) {
     jetstreamCursor = event.time_us;
@@ -229,21 +230,22 @@ function scheduleReconnect() {
 
 
 function startJetstream() {
+    logger.info('Call startJetstream...');
     if (connecting || connected) return;
 
     connecting = true;
     logger.info('Starting Jetstream...');
 
     try {
-        loadMemoryDB();
 
         try {
             jetstreamCursor = getCursor();
+            logger.info(`cursor loaded from db : "${epochUsToDateTime(jetstreamCursor)}"`);
         } catch {
             jetstreamCursor = Math.floor(Date.now() * 1000);
+            logger.info(`Can't get cursor from db. Set as current datetime : "${epochUsToDateTime(jetstreamCursor)}"`);
         }
 
-        logger.info(`cursor loaded from db : "${epochUsToDateTime(jetstreamCursor)}"`);
 
     } catch (err) {
         connecting = false;
@@ -260,7 +262,6 @@ function startJetstream() {
                 'app.bsky.feed.post',
                 'app.bsky.feed.like',
                 'app.bsky.labeler.service',
-                'blue.rito.label.auto.like',
                 'blue.rito.label.auto.like.settings',
                 'blue.rito.label.auto.post',
                 'blue.rito.label.auto.random'
@@ -280,16 +281,15 @@ function startJetstream() {
 
     // 切断時
     jetstream.on('closed', () => {
+        logger.warn('Jetstream connection closed');
         connecting = false;
         connected = false;
-        logger.warn('Jetstream connection closed');
+        jetstream = null
         scheduleReconnect();
     });
 
     // エラー時
     jetstream.on('error', (err) => {
-        connecting = false;
-        connected = false;
         logger.error(err, 'Jetstream error:');
         scheduleReconnect();
     });
@@ -341,6 +341,29 @@ function startJetstream() {
         jetstreamCursor = event.time_us;
 
         enqueue(async () => {
+            type AutoLikePost = AppBskyFeedPost.Main & {
+                "blue.rito.label.auto.like"?: string;
+            };
+
+            function isAutoLikePost(
+                record: unknown
+            ): record is AutoLikePost {
+                return (
+                    typeof record === "object" &&
+                    record !== null &&
+                    (record as any).$type === "app.bsky.feed.post" &&
+                    "blue.rito.label.auto.like" in record
+                );
+            }
+            // Like取得用のイベント
+            if (
+                process.env.LABELER_DID === event.did &&
+                isAutoLikePost(event.commit.record)
+            ) {
+                const subject = `at://${event.did}/app.bsky.feed.post/${event.commit.rkey}`
+                handleLikeEvent(event.commit.record['blue.rito.label.auto.like'] || '', { subject: subject, createdAt: event.commit.record.createdAt });
+            }
+
             try {
                 const text = event.commit.record.text || '';
 
@@ -350,11 +373,11 @@ function startJetstream() {
                         if (regex.test(text)) {
                             // ラベルを適用する処理
                             if (postRule.appliedTo === 'account') {
-                            logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey} and target account. action:${postRule.action}`);
+                                logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey} and target account. action:${postRule.action}`);
                                 if (!postRule.action) return
                                 await applyLabelForUser(event.did, [postRule.label], postRule.action, postRule.durationInHours)
                             } else if (postRule.appliedTo === 'post') {
-                            logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey} and target post.`);
+                                logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey} and target post.`);
                                 const aturi = `at://${event.did}/app.bsky.feed.post/${event.commit.rkey}`
                                 await applyLabelForPost(aturi, event.commit.cid, [postRule.label], 'add', postRule.durationInHours)
                             }
@@ -374,49 +397,17 @@ function startJetstream() {
         });
     });
 
-
-    // --- イベント登録 ---
-    jetstream.onCreate('blue.rito.label.auto.like', (event: CommitCreateEvent<'blue.rito.label.auto.like'>) => {
+    jetstream.onDelete('app.bsky.feed.post', (event: CommitDeleteEvent<'app.bsky.feed.post'>) => {
         jetstreamCursor = event.time_us;
-        if (process.env.LABELER_DID === event.did) {
+        const aturi = `at://${event.did}/app.bsky.feed.post/${event.commit.rkey}`
+        const like = memoryDB.likes.find(l => l.subject === aturi);
+
+        if (process.env.LABELER_DID === event.did && like) {
             enqueue(async () => {
                 try {
-                    const record = event.commit.record as unknown as { subject: string; createdAt: string; $type: string };
-                    handleLikeEvent(event.commit.rkey, record);
-                } catch (e) {
-                    logger.error(e)
-
-                }
-            });
-
-
-        }
-    });
-
-    jetstream.onUpdate('blue.rito.label.auto.like', (event: CommitUpdateEvent<'blue.rito.label.auto.like'>) => {
-        jetstreamCursor = event.time_us;
-        if (process.env.LABELER_DID === event.did) {
-            enqueue(async () => {
-                try {
-                    const record = event.commit.record as unknown as { subject: string; createdAt: string; $type: string };
-                    handleLikeEvent(event.commit.rkey, record);
-                } catch (e) {
-                    logger.error(e)
-
-                }
-            });
-        }
-    });
-
-    jetstream.onDelete('blue.rito.label.auto.like', (event: CommitDeleteEvent<'blue.rito.label.auto.like'>) => {
-        jetstreamCursor = event.time_us;
-
-        if (process.env.LABELER_DID === event.did) {
-            enqueue(async () => {
-                try {
-                    logger.info(`Delete Like definition. ${event.commit.rkey}`)
-                    deleteLike(event.commit.rkey);
-                    const idx = memoryDB.likes.findIndex(l => l.rkey === event.commit.rkey);
+                    logger.info(`Delete Like definition. ${like.rkey}`)
+                    deleteLike(like.rkey);
+                    const idx = memoryDB.likes.findIndex(l => l.rkey === like.rkey);
                     if (idx >= 0) memoryDB.likes.splice(idx, 1);
                 } catch (e) {
                     logger.error(e)
@@ -513,24 +504,13 @@ function startJetstream() {
             if (prev_time_us === jetstream.cursor) {
                 logger.info(`The time_us has not changed since the last check, reconnecting.`);
                 jetstream.close();
+                jetstream.close
+                connecting = false;
+                connected = false;
 
                 jetstream = null
 
-                jetstream = new Jetstream({
-                    wantedCollections: [
-                        'app.bsky.feed.post',
-                        'app.bsky.feed.like',
-                        'blue.rito.label.auto.like',
-                        'blue.rito.label.auto.post',
-                        'blue.rito.label.auto.random'
-                    ],
-                    endpoint: process.env.JETSREAM_URL || 'wss://jetstream2.us-west.bsky.network/subscribe',
-                    cursor: jetstreamCursor,
-                    ws: WebSocket,
-                });
-
-                startJetstream() 
-
+                scheduleReconnect();
             } else {
                 prev_time_us = jetstream.cursor;
 
@@ -543,6 +523,7 @@ function startJetstream() {
 
 // 起動
 logger.info('Waiting 3s before starting Jetstream...');
+loadMemoryDB();
 setTimeout(() => {
     startJetstream();
 }, 3_000);
@@ -588,23 +569,23 @@ app.get('/xrpc/blue.rito.label.auto.post.getSettings', (c) => {
 
 
 app.get('/xrpc/blue.rito.label.getSetting', (c) => {
-  const nsid = c.req.query('nsid');
+    const nsid = c.req.query('nsid');
 
-  if (!nsid) {
-    return c.json(
-      { error: 'nsid query parameter is required' },
-      400
-    );
-  }
+    if (!nsid) {
+        return c.json(
+            { error: 'nsid query parameter is required' },
+            400
+        );
+    }
 
-  const value = getPreference(nsid);
+    const value = getPreference(nsid);
 
-  try {
-    return c.json(JSON.parse(value||''));
-  } catch {
-    // 万一 JSON でなかった場合のフォールバック
-    return c.json(value);
-  }
+    try {
+        return c.json(JSON.parse(value || ''));
+    } catch {
+        // 万一 JSON でなかった場合のフォールバック
+        return c.json(value);
+    }
 });
 
 serve({
