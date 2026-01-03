@@ -78,7 +78,7 @@ export default function Like() {
 
         const writes = []
         let likeSettingsLocal = likeSettings
-        const likeLocal = like
+        let likeLocal = like
 
         // 設定にまだApplyのPostがなければ作る
         if (!likeSettings?.apply) {
@@ -208,17 +208,35 @@ export default function Like() {
         const toDelete = like.filter(l =>
             disabledKeys.has(l.rkey)
         );
+        const toDeleteKeys = new Set<string>();
 
         for (const l of toDelete) {
             const postRkey = l.subject.split('/').pop();
             if (!postRkey) continue;
 
+            // post を削除
             writes.push({
                 $type: "com.atproto.repo.applyWrites#delete" as const,
-                collection: "app.bsky.feed.post" as `${string}.${string}.${string}.${string}`,
+                collection: "app.bsky.feed.post" as `${string}.${string}.${string}`,
                 rkey: postRkey,
             });
+
+            // like 側のキーを記録
+            toDeleteKeys.add(l.rkey);
         }
+
+        // likeLocal からまとめて削除
+        likeLocal = likeLocal.filter(l => !toDeleteKeys.has(l.rkey));
+
+        console.log("toCreate", toCreate)
+        console.log("enabledKeys", enabledKeys)
+        console.log("toDelete", toDelete)
+        if (writes.length === 0) {
+            setIsLoading(false)
+            return
+        }
+
+        console.log("writes", writes)
 
         const ret = await thisClient.post('com.atproto.repo.applyWrites', {
             input: {

@@ -4,7 +4,7 @@ import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { AppBskyLabelerService } from '@atcute/bluesky';
 import { ActorIdentifier } from '@atcute/lexicons';
 import * as TID from '@atcute/tid';
-import { Button, Group, Stack, TextInput, Textarea,Checkbox } from '@mantine/core';
+import { Button, Checkbox, Group, Stack, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { Save, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -172,7 +172,7 @@ export default function Edit({
                     text: form.values.name,
                     createdAt: now,
                     locale: [locale],
-                    "blue.rito.label.auto.like":form.values.key,
+                    "blue.rito.label.auto.like": form.values.key,
                     reply: {
                         root: {
                             cid: likeSettings.apply.cid,
@@ -191,12 +191,14 @@ export default function Edit({
 
             const likeLocal = like
 
+
             likeLocal.push({
                 $type: "blue.rito.label.auto.like",
-                rkey: keyLocal,
+                rkey: form.values.key,
                 createdAt: now,
                 subject: `at://${activeDid}/app.bsky.feed.post/${rkeyLocal}`
             })
+            console.log(likeLocal)
 
             const ret = await thisClient.post('com.atproto.repo.applyWrites', {
                 input: {
@@ -264,35 +266,29 @@ export default function Edit({
 
         if (likeSettings && initialKey) {
             const writes = []
-            writes.push({
-                $type: "com.atproto.repo.applyWrites#delete" as const,
-                collection: "blue.rito.label.auto.like" as `${string}.${string}.${string}.${string}.${string}`,
-                rkey: keyLocal
-            });
-
 
             const matched = like.find(v => v.rkey === keyLocal);
             const rkey = matched?.subject?.split('/').pop();
-            if (!rkey) {
-                throw new Error('rkey not found');
-            }
-            writes.push({
-                $type: "com.atproto.repo.applyWrites#delete" as const,
-                collection: "app.bsky.feed.post" as `${string}.${string}.${string}.${string}`,
-                rkey: rkey
-            });
+            if (rkey) {
 
-            const ret = await thisClient.post('com.atproto.repo.applyWrites', {
-                input: {
-                    repo: activeDid as ActorIdentifier,
-                    writes: writes
+                writes.push({
+                    $type: "com.atproto.repo.applyWrites#delete" as const,
+                    collection: "app.bsky.feed.post" as `${string}.${string}.${string}.${string}`,
+                    rkey: rkey
+                });
+
+                const ret = await thisClient.post('com.atproto.repo.applyWrites', {
+                    input: {
+                        repo: activeDid as ActorIdentifier,
+                        writes: writes
+                    }
+                })
+                if (!ret.ok) return
+
+                if (matched) {
+                    const nextLike = like.filter(v => v.rkey !== keyLocal);
+                    setLike(nextLike);
                 }
-            })
-            if (!ret.ok) return
-
-            if (matched) {
-                const nextLike = like.filter(v => v.rkey !== keyLocal);
-                setLike(nextLike);
             }
         }
 
@@ -384,13 +380,13 @@ export default function Edit({
                     </Button>
                 )}
 
-{(!initialKey && likeSettings?.apply) && (
-  <Checkbox
-    checked={enableLike}
-    onChange={(event) => setEnableLike(event.currentTarget.checked)}
-    label={t('field.enableLike.title')}
-  />
-)}
+                {(!initialKey && likeSettings?.apply) && (
+                    <Checkbox
+                        checked={enableLike}
+                        onChange={(event) => setEnableLike(event.currentTarget.checked)}
+                        label={t('field.enableLike.title')}
+                    />
+                )}
 
                 <Button onClick={save} loading={isLoading} leftSection={<Save />}>
                     {t('button.save')}
