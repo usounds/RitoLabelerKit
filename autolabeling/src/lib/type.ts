@@ -16,6 +16,7 @@ export interface PostRecord {
     rkey: string;
     label: string;        // ラベル名
     condition: string;    // 適用条件 (正規表現など)
+    regex?: RegExp;
     appliedTo: 'account' | 'post'; // 適用先
     action?: 'add' | 'remove';     // account の場合のみ
     durationInHours: number;       // ラベルの有効期間

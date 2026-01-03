@@ -61,7 +61,22 @@ let jetstreamCursor = 0;
 let queueCursor = 0;
 let prev_time_us = 0
 let cursorUpdateInterval: NodeJS.Timeout;
-
+function compilePostRule(row: PostRecord): PostRecord {
+    try {
+        return {
+            ...row,
+            regex: new RegExp(row.condition),
+        };
+    } catch (e) {
+        console.warn(
+            `[PostRule] invalid regex: ${row.condition} (rkey=${row.rkey})`
+        );
+        return {
+            ...row,
+            regex: undefined,
+        };
+    }
+}
 
 // 起動時にオンメモリにロード
 function loadMemoryDB() {
@@ -74,8 +89,10 @@ function loadMemoryDB() {
     memoryDB.likeSubjects = likeSubjectRows; // 配列としてそのまま格納
 
     // --- Post ---
-    const postRows = db.prepare('SELECT * FROM post').all() as PostRecord[];
-    memoryDB.posts = postRows; // 配列としてそのまま格納
+    const postRows =
+        db.prepare('SELECT * FROM post').all() as PostRecord[];
+
+    memoryDB.posts = postRows.map(compilePostRule);
 }
 
 
@@ -127,6 +144,7 @@ function handlePostEvent(rkey: string, data: {
         action: data.action,
         durationInHours: data.durationInHours,
         createdAt: data.createdAt,
+        regex:new RegExp(data.condition),
     };
 
     if (idx >= 0) {
@@ -369,8 +387,7 @@ function startJetstream() {
 
                 for (let postRule of memoryDB.posts) {
                     try {
-                        const regex = new RegExp(postRule.condition);
-                        if (regex.test(text)) {
+                        if (postRule.regex?.test(text)) {
                             // ラベルを適用する処理
                             if (postRule.appliedTo === 'account') {
                                 logger.info(`Post matched rule ${postRule.label} for rkey ${postRule.rkey} and target account. action:${postRule.action}`);
