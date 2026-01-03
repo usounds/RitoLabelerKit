@@ -4,10 +4,11 @@ import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { AppBskyLabelerService, } from '@atcute/bluesky';
 import { ActorIdentifier } from '@atcute/lexicons/syntax';
 import * as TID from '@atcute/tid';
-import { Alert, Button, Center, Group, Stack, Switch, Textarea } from '@mantine/core';
+import { Alert, Button, Center, Group, Stack, Switch, Textarea, Text, Chip } from '@mantine/core';
 import { MessageCircleWarning, Save } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { notifications } from '@mantine/notifications';
 
 interface KeyNameLang {
     key: string;
@@ -29,6 +30,32 @@ function getMissingKeys(
             return { key, locales };
         });
 }
+type Row = {
+    key: string;
+    title?: string;
+    enabled: boolean;
+};
+
+interface LocaleText {
+    lang: string
+    name?: string
+    description?: string
+}
+
+export function pickLocaleText(
+    locales: LocaleText[] | undefined,
+    locale: string,
+    fallbackLocale = 'en',
+): LocaleText | null {
+    if (!locales || locales.length === 0) return null
+
+    return (
+        locales.find((l) => l.lang === locale) ??
+        locales.find((l) => l.lang === fallbackLocale) ??
+        locales[0] ??
+        null
+    )
+}
 
 export default function Like() {
     const t = useTranslations('console.manage.like');
@@ -44,6 +71,7 @@ export default function Like() {
     const setLikeSettings = useManageStore(state => state.setLikeSettings);
     const useLike = useManageStore(state => state.useLike);
     const setUseLike = useManageStore(state => state.setUseLike);
+    const [rowsState, setRowsState] = useState<Row[]>([]);
 
     const save = async () => {
         setIsLoading(true)
@@ -123,10 +151,21 @@ export default function Like() {
 
         if (!labelerDef) return
 
-        const diffs = getMissingKeys(labelerDef, like)
+        const enabledKeys = new Set(
+            rowsState.filter(r => r.enabled).map(r => r.key)
+        );
 
-        for (const diff of diffs) {
-            console.log('Key:', diff.key);
+        const disabledKeys = new Set(
+            rowsState.filter(r => !r.enabled).map(r => r.key)
+        );
+
+        const toCreate = labelerDef
+            ? getMissingKeys(labelerDef, like).filter(diff =>
+                enabledKeys.has(diff.key)
+            )
+            : [];
+
+        for (const diff of toCreate) {
             const now = new Date().toISOString()
             //for (const locale of diff.locales) {
             const rkeyLocal = TID.now();
@@ -139,7 +178,7 @@ export default function Like() {
                     text: diff.locales[0].name,
                     createdAt: now,
                     locale: [diff.locales[0]],
-                    "blue.rito.label.auto.like":diff.key,
+                    "blue.rito.label.auto.like": diff.key,
                     reply: {
                         root: {
                             cid: likeSettingsLocal?.apply.cid,
@@ -166,6 +205,21 @@ export default function Like() {
             })
         }
 
+        const toDelete = like.filter(l =>
+            disabledKeys.has(l.rkey)
+        );
+
+        for (const l of toDelete) {
+            const postRkey = l.subject.split('/').pop();
+            if (!postRkey) continue;
+
+            writes.push({
+                $type: "com.atproto.repo.applyWrites#delete" as const,
+                collection: "app.bsky.feed.post" as `${string}.${string}.${string}.${string}`,
+                rkey: postRkey,
+            });
+        }
+
         const ret = await thisClient.post('com.atproto.repo.applyWrites', {
             input: {
                 repo: activeDid as ActorIdentifier,
@@ -176,6 +230,13 @@ export default function Like() {
         if (!ret.ok) {
             console.error(ret.data.message)
         }
+
+
+        notifications.show({
+            id: 'login-process',
+            title: 'Success',
+            message: t('complete')
+        });
 
         setLike(likeLocal)
         setLikeSettings(likeSettingsLocal)
@@ -219,7 +280,7 @@ export default function Like() {
         if (!rkey) return // or throw
         const postObj = {
             $type: "com.atproto.repo.applyWrites#delete" as const,
-            collection: "app.bsky.feed.post" as `${string}.${string}.${string}.${string}.${string}`,
+            collection: "app.bsky.feed.post" as `${string}.${string}.${string}.${string}`,
             rkey: rkey
         }
 
@@ -233,9 +294,6 @@ export default function Like() {
         } catch {
 
         }
-
-        console.log(writes)
-
         const ret = await thisClient.post('com.atproto.repo.applyWrites', {
             input: {
                 repo: activeDid as ActorIdentifier,
@@ -254,66 +312,132 @@ export default function Like() {
 
     }
 
+    const rows = useMemo(() => {
+        return (
+            labelerDef?.policies.labelValueDefinitions
+                ?.slice()
+                .map((def) => {
+                    const text = pickLocaleText(def.locales, locale);
+                    const likeObj = like.find(l => l.rkey === def.identifier);
+
+                    return {
+                        key: def.identifier,
+                        title: text?.name ?? def.identifier,
+                        enabled: !!likeObj,
+                    };
+                }) ?? []
+        );
+    }, [
+        labelerDef?.policies.labelValueDefinitions,
+        like,
+        locale,
+    ]);
+
+    useEffect(() => {
+        setRowsState(rows);
+    }, [rows]);
+
+    const hasEnabled = rowsState.some((r) => r.enabled);
+
     return (
-        <Stack mt="sm" >
+        <>
+            <Stack mt="sm" >
 
-            {(likeSettings) &&
-                <Center>
-                    <Button
-                        w="auto"
-                        onClick={() => {
-                            if (likeSettings.apply?.uri) {
-                                const atUri = likeSettings.apply.uri; // ex: "at://did:plc:4voebgh2imlebm5kbaa5ov4v/app.bsky.feed.post/3mb6ogzj5g2wq"
-                                const match = atUri.match(/^at:\/\/(did:[^/]+)\/app\.bsky\.feed\.post\/(.+)$/);
-                                if (match) {
-                                    const did = match[1];
-                                    const postId = match[2];
-                                    const webUrl = `https://bsky.app/profile/${did}/post/${postId}`;
-                                    window.location.href = webUrl;
+                {(likeSettings) &&
+                    <Center>
+                        <Button
+                            w="auto"
+                            variant="outline"
+                            onClick={() => {
+                                if (likeSettings.apply?.uri) {
+                                    const atUri = likeSettings.apply.uri; // ex: "at://did:plc:4voebgh2imlebm5kbaa5ov4v/app.bsky.feed.post/3mb6ogzj5g2wq"
+                                    const match = atUri.match(/^at:\/\/(did:[^/]+)\/app\.bsky\.feed\.post\/(.+)$/);
+                                    if (match) {
+                                        const did = match[1];
+                                        const postId = match[2];
+                                        const webUrl = `https://bsky.app/profile/${did}/post/${postId}`;
+                                        window.location.href = webUrl;
+                                    }
                                 }
-                            }
-                        }}
-                    >
-                        {t('button.view')}
-                    </Button>
-                </Center>
-            }
+                            }}
+                        >
+                            {t('button.view')}
+                        </Button>
+                    </Center>
+                }
 
-            <Switch
-                label={t('field.enable.title')}
-                description={t('field.enable.description')}
-                checked={useLike}
-                onChange={(e) => { setUseLike(e.currentTarget.checked) }}
-            />
-            {(!likeSettings && useLike) &&
-                <>
-                    <Textarea
-                        label={t('field.post.title')}
-                        description={t('field.post.description')}
-                        value={description}
-                        maxLength={300}
-                        onChange={(e) => setDescription(e.currentTarget.value)}
-                    />
+                <Switch
+                    label={t('field.enable.title')}
+                    description={t('field.enable.description')}
+                    checked={useLike}
+                    onChange={(e) => { setUseLike(e.currentTarget.checked) }}
+                />
+                {useLike &&
+                    <><Stack gap={0}>
+                        <Text size="sm">{t('field.likeTarget.title')}</Text>
+                        <Text size="xs" c="dimmed">{t('field.likeTarget.description')}</Text>
+                        <Group mt="xs">
+                            {rowsState.map((row) => (
+                                <Chip
+                                    key={row.key}
+                                    checked={row.enabled}
+                                    onChange={() => {
+                                        setRowsState((prev) =>
+                                            prev.map((r) =>
+                                                r.key === row.key
+                                                    ? { ...r, enabled: !r.enabled }
+                                                    : r
+                                            )
+                                        );
+                                    }}
+                                >
+                                    {row.title}
+                                </Chip>
+                            ))}
 
+                        </Group>
+                    </Stack>
+                    </>
+                }
+
+                {(!likeSettings && useLike) &&
+                    <>
+                        <Textarea
+                            label={t('field.post.title')}
+                            description={t('field.post.description')}
+                            value={description}
+                            maxLength={300}
+                            onChange={(e) => setDescription(e.currentTarget.value)}
+                        />
+                    </>
+                }
+
+
+                {(useLike) &&
                     <Group justify="flex-end">
-                        <Button w="auto" onClick={save} loading={isLoading} leftSection={<Save />}>
+                        <Button
+                            w="auto"
+                            onClick={save}
+                            loading={isLoading}
+                            disabled={isLoading || !hasEnabled}
+                            leftSection={<Save />}
+                        >
                             {t('button.save')}
                         </Button>
                     </Group>
-                </>
-            }
+                }
+                {(likeSettings && !useLike) &&
+                    <>
+                        <Alert variant="light" color="red" icon={<MessageCircleWarning />}>{t('notice')}</Alert>
+                        <Group justify="flex-end">
+                            <Button w="auto" onClick={remove} color="red" loading={isLoading} disabled={isLoading} leftSection={<Save />}>
+                                {t('button.delete')}
+                            </Button>
+                        </Group>
+                    </>
+                }
+            </Stack>
 
-
-            {(likeSettings && !useLike) &&
-                <>
-                    <Alert variant="light" color="red" icon={<MessageCircleWarning />}>{t('notice')}</Alert>
-                    <Group justify="flex-end">
-                        <Button w="auto" onClick={remove} color="red" loading={isLoading} disabled={isLoading} leftSection={<Save />}>
-                            {t('button.delete')}
-                        </Button>
-                    </Group>
-                </>
-            }
-        </Stack>
+        </>
     );
 }

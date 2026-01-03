@@ -10,6 +10,10 @@ export type BlueRitoLabelAutoPostWithRkey = BlueRitoLabelAutoPost.Main & {
   rkey: string; // 追加するフィールド
 };
 
+export type AppBskyLabelerServiceExtend = AppBskyLabelerService.Main & {
+  rkey: string; // 追加するフィールド
+};
+
 type ManageStore = {
   labelerDef: AppBskyLabelerService.Main | null
   likeSettings: BlueRitoLabelAutoLikeSettings.Main | null

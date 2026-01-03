@@ -12,19 +12,6 @@ import { Modal, Button } from '@mantine/core';
 import Edit from '@/components/Edit/Label';
 import { useManageStore } from "@/lib/ManageStore";
 
-type LabelValueDefinition = {
-    identifier: string;
-    severity: string;
-    blurs: string;
-    adultOnly: boolean;
-    defaultSetting: string;
-    locales: LocaleText[];
-};
-
-type Policies = {
-    labelValues: string[];
-    labelValueDefinitions: LabelValueDefinition[];
-};
 
 interface LocaleText {
     lang: string

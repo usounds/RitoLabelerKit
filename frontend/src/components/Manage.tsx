@@ -66,15 +66,15 @@ export default function Manage() {
 
             if (getLikeSettings.ok) {
                 const records = await getLikeSettings.json() as unknown as BlueRitoLabelAutoLikeSettings.Main;
+                if(records){
+                    
                 setLikeSettings(records);
-                console.log(records)
                 setUseLike(true)
+                }
             }
 
             setLike(await fetchAllLikes());
-
-            const like = await fetchAllPosts()
-            setPost(like);
+            setPost(await fetchAllPosts());
 
         }
 

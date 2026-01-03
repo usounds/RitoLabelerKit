@@ -491,7 +491,7 @@ function startJetstream() {
     cursorUpdateInterval = setInterval(() => {
         if (jetstream?.cursor) {
             logger.info(
-                `jetstreamCursor=${jetstreamCursor} jetstreamCursorISO="${epochUsToDateTime(jetstreamCursor)}" queueCursor=${queueCursor} queueCursorISO="${epochUsToDateTime(queueCursor)}" size=${queue.size} pending=${queue.pending}`
+                `jetstreamCursor="${epochUsToDateTime(jetstreamCursor)}" queueCursor="${epochUsToDateTime(queueCursor)}" size=${queue.size} pending=${queue.pending}`
             );
 
             // DB に保存

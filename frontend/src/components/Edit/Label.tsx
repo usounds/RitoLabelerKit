@@ -4,7 +4,7 @@ import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { AppBskyLabelerService } from '@atcute/bluesky';
 import { ActorIdentifier } from '@atcute/lexicons';
 import * as TID from '@atcute/tid';
-import { Button, Group, Stack, TextInput, Textarea } from '@mantine/core';
+import { Button, Group, Stack, TextInput, Textarea,Checkbox } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { Save, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -100,6 +100,7 @@ export default function Edit({
     const activeDid = useXrpcAgentStore(state => state.activeDid);
     const [keyLocal] = useState(initialKey || '');
     const [isLoading, setIsLoading] = useState(false);
+    const [enableLike, setEnableLike] = useState(false);
     const likeSettings = useManageStore(state => state.likeSettings);
     const like = useManageStore(state => state.like);
     const setLike = useManageStore(state => state.setLike);
@@ -159,7 +160,7 @@ export default function Edit({
         const writes = []
 
         // Like 自動ラベリング
-        if (likeSettings && !initialKey) {
+        if (likeSettings && !initialKey && enableLike) {
             const now = new Date().toISOString()
             //for (const locale of diff.locales) {
             const rkeyLocal = TID.now();
@@ -187,17 +188,6 @@ export default function Edit({
                 },
             });
 
-
-            writes.push({
-                $type: "com.atproto.repo.applyWrites#create" as const,
-                collection: "blue.rito.label.auto.like" as `${string}.${string}.${string}.${string}.${string}`,
-                rkey: form.values.key,
-                value: {
-                    createdAt: now,
-                    subject: `at://${activeDid}/app.bsky.feed.post/${rkeyLocal}`
-
-                }
-            });
 
             const likeLocal = like
 
@@ -393,6 +383,14 @@ export default function Edit({
                         {t('button.delete')}
                     </Button>
                 )}
+
+{(!initialKey && likeSettings?.apply) && (
+  <Checkbox
+    checked={enableLike}
+    onChange={(event) => setEnableLike(event.currentTarget.checked)}
+    label={t('field.enableLike.title')}
+  />
+)}
 
                 <Button onClick={save} loading={isLoading} leftSection={<Save />}>
                     {t('button.save')}

@@ -47,15 +47,9 @@ export default function Console() {
                 (s) => s.type === "AtprotoLabeler"
             );
 
+            let domain: string | undefined;
             if (method && service) {
                 try {
-                    const result = await fetch(`${service.serviceEndpoint}/xrpc/_health`)
-                    const body = await result.json() as { version: string }
-                    if (body.version) {
-                        setLabelerVersion(body.version)
-                    }
-
-                    let domain: string | undefined;
 
                     if (typeof service.serviceEndpoint === "string") {
                         // 文字列なら URL に変換して hostname を取得
@@ -75,6 +69,23 @@ export default function Console() {
                         }
                     }
 
+                    const result = await fetch(`https://${domain}/xrpc/_health`)
+                    const body = await result.json() as { version: string }
+                    if (body.version) {
+                        setLabelerVersion(body.version)
+                    } else {
+
+                        notifications.show({
+                            id: 'login-process',
+                            title: t('title'),
+                            color: "red",
+                            message: t('manage.message.notRunning', {
+                                domain: domain ?? 'unknown',
+                            }),
+                        });
+                    }
+
+
                     setServiceEndpoint(`https://${domain}`)
 
 
@@ -87,6 +98,17 @@ export default function Console() {
                             setLabelerDef(records);
                         }
                     } catch {
+
+                        notifications.show({
+                            id: 'login-process',
+                            title: t('title'),
+                            color: "red",
+                            autoClose: false,
+                            message: t('manage.message.notRunning', {
+                                domain: domain ?? 'unknown',
+                            }),
+                        });
+
                         return
                     }
 
@@ -99,7 +121,7 @@ export default function Console() {
                     setAutoLabelingJetstreamCursor(new Date(resultbody.jetstreamCursor))
                     setAutoLabelingQueueCursor(new Date(resultbody.queueCursor))
 
-                    if (semver.lte(resultbody.version, '0.1.2')) {
+                    if (semver.lte(resultbody.version, '0.1.3')) {
                         notifications.show({
                             id: 'login-process',
                             title: t('title'),
@@ -111,6 +133,15 @@ export default function Console() {
 
                 } catch {
 
+                    notifications.show({
+                        id: 'login-process',
+                        title: t('title'),
+                        color: "red",
+                        message: t('manage.message.notRunning', {
+                            domain: domain ?? 'unknown',
+                        }),
+                        autoClose: false
+                    });
                 }
 
             } else {
