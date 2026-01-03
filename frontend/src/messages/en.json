@@ -1,232 +1,232 @@
 {
-    "title": "リトラベラーキット",
-    "description": "Blueskyのラベラーを支援するツールキット",
-    "top": {
-        "welcome": "Quick launch your Bluesky Labeler",
-        "description": "リトラベラーキットは、Blueskyのラベラーを支援するためのツールキットです。立ち上げからラベリング作業までをサポートします。",
-        "button": {
-            "start": "始める"
-        },
-        "1":{
-            "title": "コンソールの提供",
-            "description" :"どのようなラベルを作るか、自動で反映するための条件などは、全てこのサイトから管理できます。"
-        },
-        "2":{
-            "title": "Railway",
-            "description" :"ラベラーのサーバーと自動ラベリングの仕組みは、あなたのRailwayで稼働します。Railwayは従量課金制での有料です。"
-        },
-        "3":{
-            "title": "必要なもの",
-            "description" :"Railwayのアカウント、ラベラーアカウントになる新しいBlueskyのアカウント必要です。"
-        }
+  "title": "Rito Labeler Kit",
+  "description": "A toolkit to support Bluesky labelers",
+  "top": {
+    "welcome": "Quick launch your Bluesky Labeler",
+    "description": "Rito Labeler Kit is a toolkit designed to support Bluesky labelers. It helps you from initial setup to day-to-day labeling operations.",
+    "button": {
+      "start": "Get Started"
     },
-    "login": {
-        "title": "認証",
-        "start": "始める",
-        "description": "ラベラー（予定）のアカウントでログインしてください",
-        "field": {
-            "handle": "ハンドル",
-            "pleOpe": "PLCオペレーションを行うことに了承する"
-        },
-        "button": {
-            "login": "ログイン",
-            "deploy": "ダッシュボード",
-            "create": "新しいアカウントを作成"
-        },
-        "message": {
-            "nohandle": "不正なハンドルです",
-            "willauth": "認証画面にリダイレクトします...",
-            "inprogress": "認証中です。しばらくお待ちください...",
-            "plcOpe": "このアカウントはまだラベラーではありません。PLCオペレーションというアカウントに影響する操作を行う必要があります。まだリトラベラーキットをRailwayにデプロイしていない場合は、ここをタップして先にデプロイしてください。"
-        }
+    "1": {
+      "title": "Provided Console",
+      "description": "You can manage everything from this site, including what kind of labels to create and the conditions under which they are automatically applied."
     },
-    "console": {
-        "title": "コンソール",
-        "description": "ラベル管理と設定を行います。",
-        "button": {
-            "logout": "ログアウト"
-        },
-        "message": {
-            "loading": "設定を読み込み中です...",
-            "versionUp": "Auto Labeling Serviceの最新版がリリースされました。RailwayからRedeployをして、バージョンアップしてください。"
-        },
-        "initlal": {
-            "title": {
-                "1": "アカウント",
-                "2": "URLの設定",
-                "3": "秘密鍵の作成",
-                "4": "PLC操作"
-            },
-            "description": {
-                "1": "状況確認",
-                "2": "入力します",
-                "3": "作成してダウンロード",
-                "4": "反映します"
-            },
-            "button": {
-                "back": "戻る",
-                "next": "次へ",
-                "gensecKey": "秘密鍵の生成",
-                "downloadsecKey": "秘密鍵のダウンロード",
-                "plcCodeRequest": "PLC認証コードの取得",
-                "apply": "ラベラーアカウントに変更する",
-                "logout": "ログアウト"
-            },
-            "user": "@{user}でログインしました",
-            "posted": "あなたはすでに投稿を行っています。ラベラーは専用の新規のアカウントで行うことを推奨します。別のアカウントで進める場合はここをタップしてログアウトしてください。",
-            "seckey": "秘密鍵を生成します。ブラウザで処理され、本サービスの開発者に送信されることはありません。",
-            "seckeyAreSensitive": "秘密鍵はRailway以外に入力してはなりません。",
-            "plcToken": "メールによる認証が必要です。",
-            "complete": "おめでとうございます！一度ログアウトして、ダウンロードした秘密鍵などをRailwayに反映してください。",
-            "url": {
-                "title": "Railway URL",
-                "description": "Railwayで使用する予定のURLを入力してください。",
-                "error": {
-                    "bskydomain": "bsky.socialドメインは使用できません。別のドメインを指定してください。"
-                }
-            },
-            "issueAppPassword": {
-                "title": "アプリパスワードも発行する",
-                "description": "「RitoLabelerKit」の名前で発行されます。ラベルの自動反映のために必要です。"
-            },
-            "plcTolen": {
-                "title": "PLC認証コード",
-                "description": "メールで届いたPLC認証コードを入力してください。送付に時間がかかる場合があります。迷惑メールフォルダに到着していないかも確認してください",
-                "error": {
-                    "reqquired": "PLC認証コードは必須です"
-                }
-            },
-            "finalConfirm": "秘密鍵を埋め込みます。続行してもよろしいですか？"
-        },
-        "manage": {
-            "tab": {
-                "label": "ラベル",
-                "like": "いいね",
-                "post": "ポスト",
-                "random": "ランダム",
-                "settings": "設定"
-            },
-            "message":{
-                "notRunning":"Rito Labeler Litが {domain} で稼働していないようです。セットアップまたは稼働を確認してください。"
-            },  
-            "button": {
-                "logout": "ログアウト"
-            },
-            "label": {
-                "info": {
-                    "deleteConfirm": "この操作は取り消せません。一人でもラベルを使用していた場合、英語名のみ残り続けます。本当に削除しますか？"
-                },
-                "button": {
-                    "new": "ラベルを追加",
-                    "save": "保存",
-                    "edit": "編集",
-                    "delete": "削除"
-                },
-                "field": {
-                    "key": {
-                        "title": "英語名",
-                        "description": "一部のクライアントで表示されます。後から変更できません",
-                        "placeholder": "birthday",
-                        "required": "英語名は必須です",
-                        "validate": "使用できるのは、半角の英語小文字とハイフンのみです"
-                    },
-                    "title": {
-                        "title": "タイトル",
-                        "description": "ラベルの名前で、多くのクライアントではこちらが表示されます。",
-                        "placeholder": "誕生日",
-                        "required": "タイトルは必須です"
-                    },
-                    "description": {
-                        "title": "説明",
-                        "description": "ラベルの説明",
-                        "placeholder": "おめでとう",
-                        "required": "説明は必須です"
-                    },
-                    "enableLike": {
-                        "title": "いいねの自動ラベルを有効にする"
-                    }
-                }
-            },
-            "like": {
-                "notice": "このラベラーをやめる時以外、オフにする必要はありません。ラベラーをやめるので本当にこれをオフにしますか？",
-                "complete": "保存しました",
-                "field": {
-                    "enable": {
-                        "title": "いいね",
-                        "description": "いいねによる自動でのラベル反映機能を使用します"
-                    },
-                    "post": {
-                        "title": "投稿",
-                        "description": "それぞれのラベルはこのポストのツリーとして自動で投稿されます。後から変更できません。",
-                        "initial": "付けたいラベルのポストに「いいね」してください！ツリーが見えない場合は、このアカウントをフォローしてください。"
-                    },
-                    "likeTarget": {
-                        "title": "いいね自動ラベルの対象タグ",
-                        "description": "いいねによる自動ラベルを行うラベルを選択します"
-                    }
-                },
-                "button": {
-                    "save": "保存",
-                    "delete": "無効化",
-                    "view": "投稿を参照"
-                }
-            },
-            "post": {
-                "info": {
-                    "deleteConfirm": "本当に削除しますか？この操作は取り消せません。"
-                },
-                "button": {
-                    "new": "条件を追加",
-                    "edit": "編集",
-                    "save": "保存",
-                    "delete": "削除"
-                },
-                "field": {
-                    "label": {
-                        "title": "操作するラベル",
-                        "description": "張る/剥がすラベルを選択"
-                    },
-                    "appliedTo": {
-                        "title": "ラベルの適用先",
-                        "description": "ポストかアカウントを選択",
-                        "account": "アカウント",
-                        "post": "ポスト"
-                    },
-                    "condition": {
-                        "title": "条件",
-                        "description": "このポストの本文に反応します。",
-                        "placeholder": "@label.rito.blue 戌のラベルを貼って",
-                        "message":{
-                            "length" : "条件は8文字以上必要です",
-                            "musthashtag" : "ハッシュタグが必要です",
-                            "mustmention" : "ラベラーアカウントのメンションが必須です"
-                        }
-                    },
-                    "durationInHours": {
-                        "title": "ラベルの生存期間",
-                        "description": "ラベル適用後、この時間が経過するとラベルが自動で剥がれます。0の場合は無制限です。"
-                    },
-                    "action": {
-                        "title": "ラベルの操作",
-                        "description": "条件を満たす時に、ラベルをどうするかを選択",
-                        "add": "貼る",
-                        "remove": "剥がす"
-                    }
-                }
-            },
-            "settings": {
-                "field":{
-                    "delay":{
-                    "title":"Jetstream受信",
-                    "queue":"自動ラベル処理",
-                    "nodelay":"遅延なし",
-                    "description":"{minute}分遅延しています"
-                    }
-                },
-                "inform":{
-                    "serverdown" : "自動ラベルサーバーがダウンしています。RailwayでRestartしてください。"
-                }
-            }
-        }
+    "2": {
+      "title": "Railway",
+      "description": "The labeler server and automatic labeling system run on your Railway project. Railway is a paid service with usage-based billing."
+    },
+    "3": {
+      "title": "Requirements",
+      "description": "You will need a Railway account and a new Bluesky account that will act as the labeler account."
     }
+  },
+  "login": {
+    "title": "Authentication",
+    "start": "Get Started",
+    "description": "Please log in with the account that will (or is planned to) become the labeler.",
+    "field": {
+      "handle": "Handle",
+      "pleOpe": "I agree to perform PLC operations"
+    },
+    "button": {
+      "login": "Log In",
+      "deploy": "Dashboard",
+      "create": "Create a New Account"
+    },
+    "message": {
+      "nohandle": "Invalid handle",
+      "willauth": "Redirecting to the authentication screen...",
+      "inprogress": "Authenticating. Please wait...",
+      "plcOpe": "This account is not yet a labeler. You need to perform an operation called a PLC operation, which affects the account. If you have not yet deployed Rito Labeler Kit to Railway, tap here to deploy it first."
+    }
+  },
+  "console": {
+    "title": "Console",
+    "description": "Manage labels and settings.",
+    "button": {
+      "logout": "Log Out"
+    },
+    "message": {
+      "loading": "Loading settings...",
+      "versionUp": "A new version of the Auto Labeling Service has been released. Please redeploy from Railway to upgrade."
+    },
+    "initlal": {
+      "title": {
+        "1": "Account",
+        "2": "URL Settings",
+        "3": "Create Secret Key",
+        "4": "PLC Operation"
+      },
+      "description": {
+        "1": "Check status",
+        "2": "Enter information",
+        "3": "Create and download",
+        "4": "Apply changes"
+      },
+      "button": {
+        "back": "Back",
+        "next": "Next",
+        "gensecKey": "Generate Secret Key",
+        "downloadsecKey": "Download Secret Key",
+        "plcCodeRequest": "Get PLC Authentication Code",
+        "apply": "Convert to Labeler Account",
+        "logout": "Log Out"
+      },
+      "user": "Logged in as @{user}",
+      "posted": "You have already made posts. It is recommended to use a dedicated new account for labeling. If you want to continue with a different account, tap here to log out.",
+      "seckey": "A secret key will be generated. This process is handled in your browser and will not be sent to the developers of this service.",
+      "seckeyAreSensitive": "Do not enter the secret key anywhere other than Railway.",
+      "plcToken": "Email authentication is required.",
+      "complete": "Congratulations! Please log out once and apply the downloaded secret key and other settings to Railway.",
+      "url": {
+        "title": "Railway URL",
+        "description": "Enter the URL you plan to use on Railway.",
+        "error": {
+          "bskydomain": "The bsky.social domain cannot be used. Please specify a different domain."
+        }
+      },
+      "issueAppPassword": {
+        "title": "Also issue an app password",
+        "description": "It will be issued under the name \"RitoLabelerKit\". This is required for automatic label application."
+      },
+      "plcTolen": {
+        "title": "PLC Authentication Code",
+        "description": "Enter the PLC authentication code sent to you by email. It may take some time to arrive. Please also check your spam folder.",
+        "error": {
+          "reqquired": "The PLC authentication code is required"
+        }
+      },
+      "finalConfirm": "The secret key will be embedded. Do you want to continue?"
+    },
+    "manage": {
+      "tab": {
+        "label": "Labels",
+        "like": "Likes",
+        "post": "Posts",
+        "random": "Random",
+        "settings": "Settings"
+      },
+      "message": {
+        "notRunning": "Rito Labeler Kit does not appear to be running at {domain}. Please check the setup or confirm that it is running."
+      },
+      "button": {
+        "logout": "Log Out"
+      },
+      "label": {
+        "info": {
+          "deleteConfirm": "This action cannot be undone. If even one person has used this label, only the English name will remain. Are you sure you want to delete it?"
+        },
+        "button": {
+          "new": "Add Label",
+          "save": "Save",
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "field": {
+          "key": {
+            "title": "English Name",
+            "description": "Displayed in some clients. Cannot be changed later.",
+            "placeholder": "birthday",
+            "required": "The English name is required",
+            "validate": "Only lowercase English letters and hyphens are allowed"
+          },
+          "title": {
+            "title": "Title",
+            "description": "The label name. This is displayed in most clients.",
+            "placeholder": "Birthday",
+            "required": "The title is required"
+          },
+          "description": {
+            "title": "Description",
+            "description": "Description of the label",
+            "placeholder": "Congratulations",
+            "required": "The description is required"
+          },
+          "enableLike": {
+            "title": "Enable automatic labeling by likes"
+          }
+        }
+      },
+      "like": {
+        "notice": "There is usually no need to turn this off unless you are quitting this labeler. Are you sure you want to disable it?",
+        "complete": "Saved",
+        "field": {
+          "enable": {
+            "title": "Likes",
+            "description": "Enable automatic label application based on likes"
+          },
+          "post": {
+            "title": "Post",
+            "description": "Each label will be automatically posted as a tree under this post. This cannot be changed later.",
+            "initial": "Like the post of the label you want to apply! If you cannot see the tree, please follow this account."
+          },
+          "likeTarget": {
+            "title": "Target labels for like-based auto labeling",
+            "description": "Select the labels to be automatically applied by likes"
+          }
+        },
+        "button": {
+          "save": "Save",
+          "delete": "Disable",
+          "view": "View Post"
+        }
+      },
+      "post": {
+        "info": {
+          "deleteConfirm": "Are you sure you want to delete this? This action cannot be undone."
+        },
+        "button": {
+          "new": "Add Condition",
+          "edit": "Edit",
+          "save": "Save",
+          "delete": "Delete"
+        },
+        "field": {
+          "label": {
+            "title": "Target Label",
+            "description": "Select the label to apply or remove"
+          },
+          "appliedTo": {
+            "title": "Apply label to",
+            "description": "Select whether to apply to a post or an account",
+            "account": "Account",
+            "post": "Post"
+          },
+          "condition": {
+            "title": "Condition",
+            "description": "Triggers based on the content of this post.",
+            "placeholder": "@label.rito.blue Please apply the Dog label",
+            "message": {
+              "length": "The condition must be at least 8 characters long",
+              "musthashtag": "A hashtag is required",
+              "mustmention": "Mentioning the labeler account is required"
+            }
+          },
+          "durationInHours": {
+            "title": "Label duration",
+            "description": "After this amount of time passes following label application, the label will be automatically removed. 0 means unlimited."
+          },
+          "action": {
+            "title": "Label action",
+            "description": "Select what to do with the label when the condition is met",
+            "add": "Apply",
+            "remove": "Remove"
+          }
+        }
+      },
+      "settings": {
+        "field": {
+          "delay": {
+            "title": "Jetstream Reception",
+            "queue": "Automatic labeling processing",
+            "nodelay": "No delay",
+            "description": "Delayed by {minute} minutes"
+          }
+        },
+        "inform": {
+          "serverdown": "The automatic labeling server is down. Please restart it on Railway."
+        }
+      }
+    }
+  }
 }
