@@ -1,16 +1,16 @@
+import { AppBskyFeedPost, } from '@atcute/bluesky';
 import { serve } from '@hono/node-server';
 import { CommitCreateEvent, CommitDeleteEvent, CommitUpdateEvent, Jetstream } from '@skyware/jetstream';
 import 'dotenv/config';
 import { Hono } from 'hono';
 import PQueue from 'p-queue';
 import WebSocket from 'ws';
+import cursorPkg from '../package.json' with { type: 'json' };
 import type { } from './lexicons/index.js';
-import { AppBskyFeedPost, } from '@atcute/bluesky';
 import { applyLabelForPost, applyLabelForUser } from './lib/atcute.js';
-import { db, deleteLike, deleteLikeSubject, deletePost, getCursor, setCursor, upsertLike, upsertLikeSubject, upsertPost, getPreference, setPreference, deletePreference } from './lib/db.js';
+import { db, deleteLike, deleteLikeSubject, deletePost, deletePreference, getCursor, getPreference, setCursor, setPreference, upsertLike, upsertLikeSubject, upsertPost } from './lib/db.js';
 import logger from './lib/logger.js';
 import { LikeRecord, LikeSubjectRecord, memoryDB, PostRecord } from './lib/type.js';
-import cursorPkg from '../package.json' with { type: 'json' };
 
 // キュー設定
 const queue = new PQueue({ concurrency: 1 });
@@ -559,6 +559,7 @@ process.on('SIGINT', () => {
 
 // xrpc end point
 const port = parseInt(process.env.PORT || '8080');
+const hostname = process.env.HOST_NAME || '0.0.0.0';
 
 const app = new Hono();
 app.get('/', c => c.text('OK'));
@@ -601,6 +602,7 @@ app.get('/xrpc/blue.rito.label.getSetting', (c) => {
 serve({
     fetch: app.fetch,
     port,
+    hostname
 });
 
-logger.info(`Running xrpc end points at:${port}`);
+logger.info(`Running xrpc end points at ${hostname}:${port}`);
