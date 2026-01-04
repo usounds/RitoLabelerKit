@@ -12,7 +12,7 @@ import { Alert, Button, Group, SimpleGrid, Tabs } from '@mantine/core';
 import { Cog, FilePenLine, Heart, MessageCircleWarning, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 
 export default function Manage() {
@@ -37,8 +37,8 @@ export default function Manage() {
         if (!serviceEndpoint) return []
         if (!isPlcOrWebDid(activeDid)) return []
 
-            const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.auto.like.getSettings`)
-            const records = getRecord.json() as unknown as BlueRitoLabelAutoLikeWithRkey[];
+        const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.auto.like.getSettings`)
+        const records = getRecord.json() as unknown as BlueRitoLabelAutoLikeWithRkey[];
         return records;
     }
 
@@ -48,8 +48,8 @@ export default function Manage() {
         if (!isPlcOrWebDid(activeDid)) return []
 
 
-            const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.auto.post.getSettings`)
-            const records = getRecord.json() as unknown as BlueRitoLabelAutoPostWithRkey[];
+        const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.auto.post.getSettings`)
+        const records = getRecord.json() as unknown as BlueRitoLabelAutoPostWithRkey[];
 
         return records;
     }
@@ -66,10 +66,10 @@ export default function Manage() {
 
             if (getLikeSettings.ok) {
                 const records = await getLikeSettings.json() as unknown as BlueRitoLabelAutoLikeSettings.Main;
-                if(records){
-                    
-                setLikeSettings(records);
-                setUseLike(true)
+                if (records) {
+
+                    setLikeSettings(records);
+                    setUseLike(true)
                 }
             }
 
@@ -79,7 +79,7 @@ export default function Manage() {
         }
 
         handleOnLoad()
-    }, [activeDid, thisClient ,serviceEndpoint]);
+    }, [activeDid, thisClient, serviceEndpoint]);
 
     const logout = async () => {
         if (!activeDid) return
@@ -102,6 +102,8 @@ export default function Manage() {
 
     const isValidDate = (d: Date | null) =>
         d instanceof Date && !isNaN(d.getTime());
+
+    const to = useMemo(() => new Date(), []);
 
     return (
         <Tabs defaultValue="label">
@@ -137,7 +139,7 @@ export default function Manage() {
                     {isValidDate(autoLabelingCursor) && (
                         <DelayStatusCard
                             from={autoLabelingCursor!}
-                            to={new Date()}
+                            to={to}
                             title={t('settings.field.delay.title')}
                         />
                     )}
