@@ -20,9 +20,25 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale });
 
+
+  const baseUrl = "https://" + process.env.NEXT_PUBLIC_URL || 'label.rito.blue'
+
   return {
     title: t("title"),
     description: t("description"),
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+      url: `${baseUrl}/${locale}`,
+      images: [
+        {
+          url: `${baseUrl}/ogp.png`,
+          width: 1200,
+          height: 630,
+          alt: t("title"),
+        },
+      ],
+    },
   };
 }
 const myColor: MantineColorsTuple = [
