@@ -1,14 +1,14 @@
 "use client";
+import LanguageToggle from '@/components/LanguageToggle';
+import UserButton from '@/components/User/UserButton';
 import { initOAuth } from '@/lib/HandleAgent';
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { Client } from '@atcute/client';
 import { isDid } from '@atcute/lexicons/syntax';
 import { OAuthUserAgent, getSession } from '@atcute/oauth-browser-client';
 import { Avatar, Group, HoverCard } from '@mantine/core';
-import UserButton from '@/components/User/UserButton';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import NextImage from 'next/image';
-import LanguageToggle from '@/components/LanguageToggle';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from "react";
@@ -22,6 +22,7 @@ export default function Header() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+      const t = useTranslations();
   const activeDid = useXrpcAgentStore(state => state.activeDid);
   const userProf = useXrpcAgentStore(state => state.userProf);
   const setUserProf = useXrpcAgentStore(state => state.setUserProf);
@@ -91,7 +92,7 @@ export default function Header() {
         <Group gap="xs">
           <NextImage src='/favicon.png' width={20} height={20} alt="icon" />
           <Link href="/" className={classes.link}>
-            Rito Labeler Console
+            {t('title')}
           </Link>
         </Group>
 

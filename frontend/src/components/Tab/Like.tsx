@@ -7,8 +7,14 @@ import * as TID from '@atcute/tid';
 import { Alert, Button, Center, Group, Stack, Switch, Textarea, Text, Chip } from '@mantine/core';
 import { MessageCircleWarning, Save } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { AppBskyFeedPost, AppBskyRichtextFacet } from '@atcute/bluesky';
 import { useState, useMemo, useEffect } from 'react';
 import { notifications } from '@mantine/notifications';
+
+export const TAG_REGEX =
+  // eslint-disable-next-line no-misleading-character-class
+  /(^|\s)[#＃]((?!\ufe0f)[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*[^\d\s\p{P}\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]+[^\s\u00AD\u2060\u200A\u200B\u200C\u200D\u20e2]*)?/gu
+export const TRAILING_PUNCTUATION_REGEX = /\p{P}+$/gu
 
 interface KeyNameLang {
     key: string;
@@ -85,6 +91,47 @@ export default function Like() {
             const rootpost = []
             const rkeyLocal = TID.now();
 
+            //ハッシュタグ
+                const facets: AppBskyRichtextFacet.Main[] = [];
+
+
+                // ハッシュタグ
+                let m: RegExpExecArray | null;
+                function utf16IndexToUtf8Index(str: string, utf16Index: number): number {
+                    return new TextEncoder().encode(str.slice(0, utf16Index)).length;
+                }
+
+                while ((m = TAG_REGEX.exec(description))) {
+                    const prefix = m[1];
+                    let candidateTag = m[2];
+
+                    if (!candidateTag) continue;
+
+                    candidateTag = candidateTag.trim().replace(TRAILING_PUNCTUATION_REGEX, '');
+
+                    if (candidateTag.length === 0 || candidateTag.length > 64) continue;
+
+                    const startPos = m.index + prefix.length;
+                    const fullTag = '#' + candidateTag;
+
+                    const byteStart = utf16IndexToUtf8Index(description, startPos);
+                    const byteLength = new TextEncoder().encode(fullTag).length;
+                    const byteEnd = byteStart + byteLength;
+
+                    facets.push({
+                        index: {
+                            byteStart,
+                            byteEnd,
+                        },
+                        features: [
+                            {
+                                $type: 'app.bsky.richtext.facet#tag' as const,
+                                tag: candidateTag,
+                            },
+                        ],
+                    });
+                }
+
             rootpost.push({
                 $type: "com.atproto.repo.applyWrites#create" as const,
                 collection: "app.bsky.feed.post" as `${string}.${string}.${string}`,
@@ -92,7 +139,8 @@ export default function Like() {
                 value: {
                     text: description,
                     createdAt: new Date().toISOString(),
-                    locale: [locale]
+                    locale: [locale],
+                    facets: facets
                 },
             });
             rootpost.push({

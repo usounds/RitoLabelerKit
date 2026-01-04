@@ -18,7 +18,7 @@ https://label.rito.blue
 
 ## Put Sec key and did for Railway
 
-## Set up are coompleted!
+## Set up are completed!
 You can use labeler console the following functions:
 - Add or remove label definition
 - Auto labeling condition settings( like based or post based )
