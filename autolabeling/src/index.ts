@@ -78,6 +78,13 @@ function compilePostRule(row: PostRecord): PostRecord {
     }
 }
 
+function clearCursorInterval() {
+    if (cursorUpdateInterval) {
+        clearInterval(cursorUpdateInterval);
+        cursorUpdateInterval = undefined as any;
+    }
+}
+
 // 起動時にオンメモリにロード
 function loadMemoryDB() {
     // --- Like ---
@@ -144,7 +151,7 @@ function handlePostEvent(rkey: string, data: {
         action: data.action,
         durationInHours: data.durationInHours,
         createdAt: data.createdAt,
-        regex:new RegExp(data.condition),
+        regex: new RegExp(data.condition),
     };
 
     if (idx >= 0) {
@@ -252,6 +259,7 @@ function startJetstream() {
     if (connecting || connected) return;
 
     connecting = true;
+    clearCursorInterval();
     logger.info('Starting Jetstream...');
 
     try {
@@ -304,6 +312,7 @@ function startJetstream() {
         connected = false;
         jetstream = null
         scheduleReconnect();
+        clearCursorInterval();
     });
 
     // エラー時
