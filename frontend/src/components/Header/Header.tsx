@@ -8,6 +8,7 @@ import { Avatar, Group, HoverCard } from '@mantine/core';
 import UserButton from '@/components/User/UserButton';
 import { useLocale } from 'next-intl';
 import NextImage from 'next/image';
+import LanguageToggle from '@/components/LanguageToggle';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from "react";
@@ -95,7 +96,7 @@ export default function Header() {
         </Group>
 
         <Group>
-          <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
+          <Group gap={0}className={classes.links} visibleFrom="xs">
             {items}
             <HoverCard >
               <HoverCard.Target>
@@ -108,6 +109,7 @@ export default function Header() {
               }
             </HoverCard>
           </Group>
+            <LanguageToggle />
         </Group>
       </div>
     </header>
