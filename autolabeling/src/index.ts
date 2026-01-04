@@ -520,14 +520,7 @@ function startJetstream() {
 
             if (prev_time_us === jetstream.cursor) {
                 logger.info(`The time_us has not changed since the last check, reconnecting.`);
-                jetstream.close();
-                jetstream.close
-                connecting = false;
-                connected = false;
-
-                jetstream = null
-
-                scheduleReconnect();
+                process.exit(1)
             } else {
                 prev_time_us = jetstream.cursor;
 
