@@ -21,7 +21,7 @@ export async function Footer({ locale }: FooterProps) {
                     <Link href={`/${locale}/tos`} style={{ textDecoration: 'none', cursor: 'pointer', color: 'gray', fontSize: '0.875rem' }}>
                         {t('footer.termofuse')}
                     </Link>
-                    <Link href={`/${locale}/privacy`} style={{ textDecoration: 'none', cursor: 'pointer', color: 'gray', fontSize: '0.875rem' }}>
+                    <Link href={`/${locale}/policy`} style={{ textDecoration: 'none', cursor: 'pointer', color: 'gray', fontSize: '0.875rem' }}>
                         {t('footer.privacyPolicy')}
                     </Link>
 
