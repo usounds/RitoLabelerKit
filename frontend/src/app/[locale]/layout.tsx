@@ -91,7 +91,7 @@ export default async function RootLayout({
             <Header />
             <Notifications />
             {children}
-          <Footer locale='ja'/>
+          <Footer />
           </MantineProvider>
         </NextIntlClientProvider>
       </body>
