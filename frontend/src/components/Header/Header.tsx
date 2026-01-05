@@ -22,7 +22,7 @@ export default function Header() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-      const t = useTranslations();
+  const t = useTranslations();
   const activeDid = useXrpcAgentStore(state => state.activeDid);
   const userProf = useXrpcAgentStore(state => state.userProf);
   const setUserProf = useXrpcAgentStore(state => state.setUserProf);
@@ -97,7 +97,7 @@ export default function Header() {
         </Group>
 
         <Group>
-          <Group gap={0}className={classes.links} visibleFrom="xs">
+          <Group gap={0} className={classes.links} visibleFrom="xs">
             {items}
             <HoverCard >
               <HoverCard.Target>
@@ -110,7 +110,7 @@ export default function Header() {
               }
             </HoverCard>
           </Group>
-            <LanguageToggle />
+          <LanguageToggle />
         </Group>
       </div>
     </header>

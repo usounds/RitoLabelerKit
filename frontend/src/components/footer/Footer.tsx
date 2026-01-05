@@ -1,15 +1,13 @@
 import { Container, Group, Text } from '@mantine/core';
-import { getTranslations } from 'next-intl/server';
+import {  useTranslations,useLocale } from 'next-intl';
 import Link from 'next/link';
 import { FaBluesky, FaGithub } from "react-icons/fa6";
 import classes from './Footer.module.scss';
 
-type FooterProps = {
-    locale: string;
-};
-
-export async function Footer({ locale }: FooterProps) {
-    const t = await getTranslations({ locale });
+export function Footer() {
+    
+      const t = useTranslations();
+      const locale = useLocale()
 
     return (
         <div className={classes.footer}>
