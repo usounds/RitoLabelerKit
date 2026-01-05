@@ -1,7 +1,9 @@
 # Terms of Service
 
 ## 1. Copyright
-- The copyright of each label belongs to the person who posted it.
+- Copyright of the portions of labels independently created by users belongs to the respective users.
+- If a label contains works owned by third parties, the copyright remains with the original rights holders, and the Service does not claim or inherit any such rights.
+- Users bear full responsibility for the legality and rights related to any third-party works included in their content, and the developer assumes no responsibility whatsoever.
 
 ## 2. Scope of Disclosure
 - Labels posted on this service may be made publicly available on PDS, Bluesky, and this website.
@@ -36,5 +38,5 @@ This service assumes no responsibility for any damages arising from the use of e
 These Terms of Service may be revised as necessary.  
 If revisions are made, notice will be provided on this service.
 
-# Revision History
+## 9. Revision History
 - January 5, 2026: Initial release

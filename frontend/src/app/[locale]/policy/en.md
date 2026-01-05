@@ -22,7 +22,8 @@ The Service uses the following external services:
   → [Google Privacy Policy](https://policies.google.com/privacy)
 
 ## 5. Information Management
-Label information is published to the PDS, and no specific retention period is defined.
+Authentication information is stored only in the user's browser.
+The contents of automatic labeling are stored on the user's Railway environment.
 
 ## 6. User Rights
 Information including DIDs is managed by users themselves and is not subject to deletion requests to the Service.  
