@@ -16,13 +16,13 @@ export default async function PrivacyPage({ params }: PageProps) {
   const basePath = process.cwd(); // frontend/
   const filePath = path.join(
     basePath,
-    "src/app/[locale]/privacy",
+    "src/app/[locale]/policy",
     `${locale}.md`
   );
 
   const fallbackPath = path.join(
     basePath,
-    "src/app/[locale]/privacy/en.md"
+    "src/app/[locale]/policy/en.md"
   );
 
   let content: string;
