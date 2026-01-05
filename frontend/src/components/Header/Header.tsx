@@ -30,7 +30,7 @@ export default function Header() {
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (pathname?.includes('/callback') || pathname?.includes('/tos') || pathname?.includes('/policy')) {
+    if (!pathname?.includes('/console') ) {
       return;
     }
 
