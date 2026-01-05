@@ -32,18 +32,25 @@ export default function Header() {
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!pathname?.includes('/console')) {
-      return;
-    }
+    if (!pathname) return;
+    const segments = pathname.split('/').filter(Boolean);
+
+    const isLocaleConsole =
+      segments.length >= 2 &&
+      segments[0].length === 2 &&
+      segments[1] === 'console';
+
 
     // activeDid が無い → 3秒後にリダイレクト予約
     if (!activeDid) {
-      if (!redirectTimerRef.current) {
-        redirectTimerRef.current = setTimeout(() => {
-          router.replace(`/${locale}/`);
-        }, 1000);
+      if (isLocaleConsole) {
+        if (!redirectTimerRef.current) {
+          redirectTimerRef.current = setTimeout(() => {
+            router.replace(`/${locale}/`);
+          }, 3000);
+        }
+        return;
       }
-      return;
     }
 
     // activeDid が来た → タイマー解除
@@ -59,7 +66,7 @@ export default function Header() {
       try {
         const session = await getSession(activeDid, { allowStale: true });
         const agent = new OAuthUserAgent(session);
-        const rpc = new Client({handler:agent});
+        const rpc = new Client({ handler: agent });
         setThisClient(rpc);
         const customHandler = buildFetchHandler({
           async handle(pathname: string, init: RequestInit) {
@@ -73,7 +80,7 @@ export default function Header() {
           },
         });
 
-        const rpc2 = new Client({ handler:customHandler });
+        const rpc2 = new Client({ handler: customHandler });
         setThisClientWithAtprotoLabelerHeader(rpc2);
 
         const rpcWithPwoxy = new Client({
