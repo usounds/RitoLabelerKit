@@ -27,6 +27,7 @@ export default function Header() {
   const userProf = useXrpcAgentStore(state => state.userProf);
   const setUserProf = useXrpcAgentStore(state => state.setUserProf);
   const setThisClient = useXrpcAgentStore(state => state.setThisClient);
+  const setThisClientWithAtprotoLabelerHeader = useXrpcAgentStore(state => state.setThisClientWithAtprotoLabelerHeader);
   const setThisClientWithProxy = useXrpcAgentStore(state => state.setThisClientWithProxy);
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -58,7 +59,9 @@ export default function Header() {
       try {
         const session = await getSession(activeDid, { allowStale: true });
         const agent = new OAuthUserAgent(session);
-        const handler = buildFetchHandler({
+        const rpc = new Client({handler:agent});
+        setThisClient(rpc);
+        const customHandler = buildFetchHandler({
           async handle(pathname: string, init: RequestInit) {
             return agent.handle(pathname, {
               ...init,
@@ -70,8 +73,8 @@ export default function Header() {
           },
         });
 
-        const rpc = new Client({ handler });
-        setThisClient(rpc);
+        const rpc2 = new Client({ handler:customHandler });
+        setThisClientWithAtprotoLabelerHeader(rpc2);
 
         const rpcWithPwoxy = new Client({
           handler: agent, proxy: {

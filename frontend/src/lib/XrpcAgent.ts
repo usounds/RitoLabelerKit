@@ -9,6 +9,7 @@ type State = {
   publicAgent: Client;
   thisClient: Client;
   thisClientWithProxy: Client;
+  thisClientWithAtprotoLabelerHeader: Client;
   isLoginProcess?: boolean;
 };
 type Action = {
@@ -18,6 +19,7 @@ type Action = {
   setPublicAgent: (publicAgent: Client) => void;
   setThisClient: (thisClient: Client) => void;
   setThisClientWithProxy: (thisClientWithProxy: Client) => void;
+  setThisClientWithAtprotoLabelerHeader: (thisClientWithAtprotoLabelerHeader: Client) => void;
   setIsLoginProcess: (isLoginProcess: boolean) => void;
 };
 export const useXrpcAgentStore = create<State & Action>()(
@@ -36,6 +38,11 @@ export const useXrpcAgentStore = create<State & Action>()(
           service: `${process.env.NEXT_PUBLIC_URL}`,
         }),
       }),
+      thisClientWithAtprotoLabelerHeader: new Client({
+        handler: simpleFetchHandler({
+          service: `${process.env.NEXT_PUBLIC_URL}`,
+        }),
+      }),
       thisClientWithProxy: new Client({
         handler: simpleFetchHandler({
           service: `${process.env.NEXT_PUBLIC_URL}`,
@@ -50,6 +57,7 @@ export const useXrpcAgentStore = create<State & Action>()(
       setPublicAgent: (publicAgent: Client) => set({ publicAgent }),
       setThisClient: (thisClient: Client) => set({ thisClient }),
       setThisClientWithProxy: (thisClientWithProxy: Client) => set({ thisClientWithProxy }),
+      setThisClientWithAtprotoLabelerHeader: (thisClientWithAtprotoLabelerHeader: Client) => set({ thisClientWithAtprotoLabelerHeader }),
       setIsLoginProcess: (isLoginProcess: boolean) => set({ isLoginProcess }),
     }),
     {

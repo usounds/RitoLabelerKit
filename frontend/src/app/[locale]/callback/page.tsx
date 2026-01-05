@@ -15,6 +15,7 @@ export default function Callback() {
     const setActiveDid = useXrpcAgentStore(state => state.setActiveDid);
     const setUserProf = useXrpcAgentStore(state => state.setUserProf);
     const setThisClientWithProxy = useXrpcAgentStore(state => state.setThisClientWithProxy);
+    const setThisClientWithAtprotoLabelerHeader = useXrpcAgentStore(state => state.setThisClientWithAtprotoLabelerHeader);
     const locale = useLocale();
     const router = useRouter();
     const t = useTranslations('login');
@@ -34,30 +35,31 @@ export default function Callback() {
 
                 // Agent と RPC 作成
                 const agent = new OAuthUserAgent(session);
-                const handler = buildFetchHandler({
-                    async handle(pathname: string, init: RequestInit) {
-                        return agent.handle(pathname, {
-                            ...init,
-                            headers: {
-                                ...(init.headers ?? {}),
-                                'atproto-accept-labelers': session.info.sub,
-                            },
-                        });
-                    },
-                });
 
-                const rpc = new Client({ handler });
+        const rpc = new Client({handler:agent});
+        setThisClient(rpc);
+        const customHandler = buildFetchHandler({
+          async handle(pathname: string, init: RequestInit) {
+            return agent.handle(pathname, {
+              ...init,
+              headers: {
+                ...(init.headers ?? {}),
+                'atproto-accept-labelers': session.info.sub,
+              },
+            });
+          },
+        });
 
-                // ここで Client を state に保存
-                setThisClient(rpc);
+        const rpc2 = new Client({ handler:customHandler });
+        setThisClientWithAtprotoLabelerHeader(rpc2);
 
-
-                const rpcWithPwoxy = new Client({
-                    handler:agent, proxy: {
-                        serviceId: "#atproto_labeler",
-                        did: session.info.sub as `did:${string}:${string}`
-                    }
-                });
+        const rpcWithPwoxy = new Client({
+          handler: agent, proxy: {
+            serviceId: "#atproto_labeler",
+            did: session.info.sub as `did:${string}:${string}`
+          }
+        });
+        setThisClientWithProxy(rpcWithPwoxy);
                 setThisClientWithProxy(rpcWithPwoxy);
 
                 setActiveDid(session.info.sub);

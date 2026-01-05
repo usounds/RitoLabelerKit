@@ -15,13 +15,12 @@ export default function Post() {
     const t = useTranslations('console.manage.manual');
     const [isLoading, setIsLoading] = useState(false);
     const [isSearched, setIsSearched] = useState(false);
-    const [isSave, setIsSave] = useState(false);
     const [error, setError] = useState<string>('');
     const [did, setDid] = useState<string>('');
     const locale = useLocale();
     const [handle, setHandle] = useState('');
     const publicAgent = useXrpcAgentStore(state => state.publicAgent);
-    const thisClient = useXrpcAgentStore(state => state.thisClient);
+    const thisClientWithAtprotoLabelerHeader = useXrpcAgentStore(state => state.thisClientWithAtprotoLabelerHeader);
     const activeDid = useXrpcAgentStore(state => state.activeDid);
     const thisClientWithProxy = useXrpcAgentStore(state => state.thisClientWithProxy);
     const labelerDef = useManageStore(state => state.labelerDef);
@@ -55,21 +54,30 @@ export default function Post() {
     };
 
     useEffect(() => {
-        const handleOnLoad = async () => {
+            const nextRows =
+                labelerDef?.policies.labelValueDefinitions
+                    ?.map((def) => {
+                        const text = pickLocaleText(def.locales, locale);
 
-        }
+                        return {
+                            key: def.identifier,
+                            title: text?.name ?? def.identifier,
+                            enabled: false,
+                        };
+                    }) ?? [];
 
-        handleOnLoad()
-    }, [handle]);
+            setRowsState(nextRows);
+            setInitialRows(nextRows);
+    }, [labelerDef, locale]);
 
     const handleSearch = async () => {
-        if (!thisClient || !handle) return;
+        if (!thisClientWithAtprotoLabelerHeader || !handle) return;
         setError('')
         setIsLoading(true);
         setIsSearched(false);
 
         try {
-            const profile = await thisClient.get(
+            const profile = await thisClientWithAtprotoLabelerHeader.get(
                 'app.bsky.actor.getProfile',
                 {
                     params: {
