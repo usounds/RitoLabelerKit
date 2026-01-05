@@ -7,7 +7,7 @@ import * as TID from '@atcute/tid';
 import { Alert, Button, Center, Group, Stack, Switch, Textarea, Text, Chip } from '@mantine/core';
 import { MessageCircleWarning, Save } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { AppBskyFeedPost, AppBskyRichtextFacet } from '@atcute/bluesky';
+import {  AppBskyRichtextFacet } from '@atcute/bluesky';
 import { useState, useMemo, useEffect } from 'react';
 import { notifications } from '@mantine/notifications';
 
@@ -36,13 +36,13 @@ function getMissingKeys(
             return { key, locales };
         });
 }
-type Row = {
+export type Row = {
     key: string;
     title?: string;
     enabled: boolean;
 };
 
-interface LocaleText {
+export interface LocaleText {
     lang: string
     name?: string
     description?: string

@@ -1,6 +1,6 @@
 "use client";
 import { initOAuth } from '@/lib/HandleAgent';
-import { Client } from '@atcute/client';
+import { Client, buildFetchHandler } from '@atcute/client';
 import { OAuthUserAgent, finalizeAuthorization } from '@atcute/oauth-browser-client';
 import { useEffect } from 'react';
 import { useLocale } from 'next-intl';
@@ -14,6 +14,7 @@ export default function Callback() {
     const setThisClient = useXrpcAgentStore(state => state.setThisClient);
     const setActiveDid = useXrpcAgentStore(state => state.setActiveDid);
     const setUserProf = useXrpcAgentStore(state => state.setUserProf);
+    const setThisClientWithProxy = useXrpcAgentStore(state => state.setThisClientWithProxy);
     const locale = useLocale();
     const router = useRouter();
     const t = useTranslations('login');
@@ -33,10 +34,31 @@ export default function Callback() {
 
                 // Agent と RPC 作成
                 const agent = new OAuthUserAgent(session);
-                const rpc = new Client({ handler: agent });
+                const handler = buildFetchHandler({
+                    async handle(pathname: string, init: RequestInit) {
+                        return agent.handle(pathname, {
+                            ...init,
+                            headers: {
+                                ...(init.headers ?? {}),
+                                'atproto-accept-labelers': session.info.sub,
+                            },
+                        });
+                    },
+                });
+
+                const rpc = new Client({ handler });
 
                 // ここで Client を state に保存
                 setThisClient(rpc);
+
+
+                const rpcWithPwoxy = new Client({
+                    handler:agent, proxy: {
+                        serviceId: "#atproto_labeler",
+                        did: session.info.sub as `did:${string}:${string}`
+                    }
+                });
+                setThisClientWithProxy(rpcWithPwoxy);
 
                 setActiveDid(session.info.sub);
 

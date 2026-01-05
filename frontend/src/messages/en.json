@@ -104,7 +104,8 @@
         "like": "Likes",
         "post": "Posts",
         "random": "Random",
-        "settings": "Settings"
+        "settings": "Settings",
+        "manual": "Manual"
       },
       "message": {
         "notRunning": "Rito Labeler Kit does not appear to be running at {domain}. Please check the setup or confirm that it is running."
@@ -226,11 +227,30 @@
         "inform": {
           "serverdown": "The automatic labeling server is down. Please restart it on Railway."
         }
-      }
+      },
+            "manual": {
+                "field": {
+                    "user":{
+                        "title": "User",
+                        "description" :"Chooses user who change labels"
+                    },
+                    "label":{
+                        "title": "Label",
+                        "description" :"Select labels"
+                    }
+                },
+                "button":{
+                    "save":"Save"
+                },
+                "inform": {
+                    "completed": "Label applied!",
+                    "nohandle": "No handle"
+                }
+            }
     }
   },
-    "footer": {
-        "termofuse": "Term of Use",
-        "privacyPolicy": "Privacy Policy"
-    }
+  "footer": {
+    "termofuse": "Term of Use",
+    "privacyPolicy": "Privacy Policy"
+  }
 }

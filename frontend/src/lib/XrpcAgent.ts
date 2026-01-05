@@ -8,6 +8,7 @@ type State = {
   userProf: AppBskyActorDefs.ProfileViewDetailed | null;
   publicAgent: Client;
   thisClient: Client;
+  thisClientWithProxy: Client;
   isLoginProcess?: boolean;
 };
 type Action = {
@@ -16,6 +17,7 @@ type Action = {
   setUserProf: (userProf: AppBskyActorDefs.ProfileViewDetailed | null) => void;
   setPublicAgent: (publicAgent: Client) => void;
   setThisClient: (thisClient: Client) => void;
+  setThisClientWithProxy: (thisClientWithProxy: Client) => void;
   setIsLoginProcess: (isLoginProcess: boolean) => void;
 };
 export const useXrpcAgentStore = create<State & Action>()(
@@ -34,6 +36,11 @@ export const useXrpcAgentStore = create<State & Action>()(
           service: `${process.env.NEXT_PUBLIC_URL}`,
         }),
       }),
+      thisClientWithProxy: new Client({
+        handler: simpleFetchHandler({
+          service: `${process.env.NEXT_PUBLIC_URL}`,
+        }),
+      }),
       isLoginProcess : false,
 
       setActiveDid: (did: string | null) => set({ activeDid: did }),
@@ -42,6 +49,7 @@ export const useXrpcAgentStore = create<State & Action>()(
         set({ userProf }),
       setPublicAgent: (publicAgent: Client) => set({ publicAgent }),
       setThisClient: (thisClient: Client) => set({ thisClient }),
+      setThisClientWithProxy: (thisClientWithProxy: Client) => set({ thisClientWithProxy }),
       setIsLoginProcess: (isLoginProcess: boolean) => set({ isLoginProcess }),
     }),
     {

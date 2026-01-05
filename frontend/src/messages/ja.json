@@ -104,7 +104,8 @@
                 "like": "いいね",
                 "post": "ポスト",
                 "random": "ランダム",
-                "settings": "設定"
+                "settings": "設定",
+                "manual": "手動"
             },
             "message": {
                 "notRunning": "Rito Labeler Litが {domain} で稼働していないようです。セットアップまたは稼働を確認してください。"
@@ -225,6 +226,25 @@
                 },
                 "inform": {
                     "serverdown": "自動ラベルサーバーがダウンしています。RailwayでRestartしてください。"
+                }
+            },
+            "manual": {
+                "field": {
+                    "user":{
+                        "title": "ユーザー",
+                        "description" :"ラベルを操作するユーザーを選択"
+                    },
+                    "label":{
+                        "title": "ラベル",
+                        "description" :"ラベルを選択"
+                    }
+                },
+                "button":{
+                    "save":"保存"
+                },
+                "inform": {
+                    "completed": "ラベルを反映しました",
+                    "nohandle": "ユーザーが見つかりません"
                 }
             }
         }

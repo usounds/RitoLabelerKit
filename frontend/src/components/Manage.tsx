@@ -3,16 +3,17 @@ import { DelayStatusCard } from '@/components/DelayStatusCard';
 import { TableScrollArea } from "@/components/LabelTable/Table";
 import Like from "@/components/Tab/Like";
 import Post from "@/components/Tab/Post";
+import Manual from "@/components/Tab/Manual";
 import { BlueRitoLabelAutoLikeSettings } from '@/lexicons/index';
 import { isPlcOrWebDid } from '@/lib/HandleAgent';
 import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManageStore } from "@/lib/ManageStore";
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
 import { Alert, Button, Group, SimpleGrid, Tabs } from '@mantine/core';
-import { Cog, FilePenLine, Heart, MessageCircleWarning, Tag } from 'lucide-react';
+import { Cog, FilePenLine, Heart, MessageCircleWarning, Pickaxe, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 
 export default function Manage() {
@@ -117,6 +118,9 @@ export default function Manage() {
                 <Tabs.Tab value="post" leftSection={<FilePenLine size={14} />}>
                     {t('tab.post')}
                 </Tabs.Tab>
+                <Tabs.Tab value="manual" leftSection={<Pickaxe size={14} />}>
+                    {t('tab.manual')}
+                </Tabs.Tab>
                 <Tabs.Tab value="settings" leftSection={<Cog size={14} />}>
                     {t('tab.settings')}
                 </Tabs.Tab>
@@ -132,6 +136,10 @@ export default function Manage() {
 
             <Tabs.Panel value="post">
                 <Post />
+            </Tabs.Panel>
+
+            <Tabs.Panel value="manual">
+                <Manual />
             </Tabs.Panel>
 
             <Tabs.Panel value="settings">

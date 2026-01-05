@@ -3,7 +3,7 @@ import LanguageToggle from '@/components/LanguageToggle';
 import UserButton from '@/components/User/UserButton';
 import { initOAuth } from '@/lib/HandleAgent';
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
-import { Client } from '@atcute/client';
+import { Client, buildFetchHandler } from '@atcute/client';
 import { isDid } from '@atcute/lexicons/syntax';
 import { OAuthUserAgent, getSession } from '@atcute/oauth-browser-client';
 import { Avatar, Group, HoverCard } from '@mantine/core';
@@ -27,10 +27,11 @@ export default function Header() {
   const userProf = useXrpcAgentStore(state => state.userProf);
   const setUserProf = useXrpcAgentStore(state => state.setUserProf);
   const setThisClient = useXrpcAgentStore(state => state.setThisClient);
+  const setThisClientWithProxy = useXrpcAgentStore(state => state.setThisClientWithProxy);
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!pathname?.includes('/console') ) {
+    if (!pathname?.includes('/console')) {
       return;
     }
 
@@ -57,8 +58,28 @@ export default function Header() {
       try {
         const session = await getSession(activeDid, { allowStale: true });
         const agent = new OAuthUserAgent(session);
-        const rpc = new Client({ handler: agent });
-        setThisClient(rpc)
+        const handler = buildFetchHandler({
+          async handle(pathname: string, init: RequestInit) {
+            return agent.handle(pathname, {
+              ...init,
+              headers: {
+                ...(init.headers ?? {}),
+                'atproto-accept-labelers': session.info.sub,
+              },
+            });
+          },
+        });
+
+        const rpc = new Client({ handler });
+        setThisClient(rpc);
+
+        const rpcWithPwoxy = new Client({
+          handler: agent, proxy: {
+            serviceId: "#atproto_labeler",
+            did: session.info.sub as `did:${string}:${string}`
+          }
+        });
+        setThisClientWithProxy(rpcWithPwoxy);
         const profile = await rpc.get('app.bsky.actor.getProfile', {
           params: {
             actor: session.info.sub,

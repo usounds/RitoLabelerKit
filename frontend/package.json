@@ -18,6 +18,7 @@
     "@atcute/identity-resolver": "^1.2.1",
     "@atcute/lexicons": "^1.2.6",
     "@atcute/oauth-browser-client": "^2.0.3",
+    "@atcute/ozone": "^3.1.13",
     "@atcute/tid": "^1.1.0",
     "@mantine/core": "^8.3.10",
     "@mantine/form": "^8.3.10",
