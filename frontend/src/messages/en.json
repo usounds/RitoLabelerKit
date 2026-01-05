@@ -228,5 +228,9 @@
         }
       }
     }
-  }
+  },
+    "footer": {
+        "termofuse": "Term of Use",
+        "privacyPolicy": "Privacy Policy"
+    }
 }

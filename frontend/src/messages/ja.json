@@ -7,17 +7,17 @@
         "button": {
             "start": "始める"
         },
-        "1":{
+        "1": {
             "title": "コンソールの提供",
-            "description" :"どのようなラベルを作るか、自動で反映するための条件などは、全てこのサイトから管理できます。"
+            "description": "どのようなラベルを作るか、自動で反映するための条件などは、全てこのサイトから管理できます。"
         },
-        "2":{
+        "2": {
             "title": "Railway",
-            "description" :"ラベラーのサーバーと自動ラベリングの仕組みは、あなたのRailwayで稼働します。Railwayは従量課金制での有料です。"
+            "description": "ラベラーのサーバーと自動ラベリングの仕組みは、あなたのRailwayで稼働します。Railwayは従量課金制での有料です。"
         },
-        "3":{
+        "3": {
             "title": "必要なもの",
-            "description" :"Railwayのアカウント、ラベラーアカウントになる新しいBlueskyのアカウント必要です。"
+            "description": "Railwayのアカウント、ラベラーアカウントになる新しいBlueskyのアカウント必要です。"
         }
     },
     "login": {
@@ -106,9 +106,9 @@
                 "random": "ランダム",
                 "settings": "設定"
             },
-            "message":{
-                "notRunning":"Rito Labeler Litが {domain} で稼働していないようです。セットアップまたは稼働を確認してください。"
-            },  
+            "message": {
+                "notRunning": "Rito Labeler Litが {domain} で稼働していないようです。セットアップまたは稼働を確認してください。"
+            },
             "button": {
                 "logout": "ログアウト"
             },
@@ -196,10 +196,10 @@
                         "title": "条件",
                         "description": "このポストの本文に反応します。",
                         "placeholder": "@label.rito.blue 戌のラベルを貼って",
-                        "message":{
-                            "length" : "条件は8文字以上必要です",
-                            "musthashtag" : "ハッシュタグが必要です",
-                            "mustmention" : "ラベラーアカウントのメンションが必須です"
+                        "message": {
+                            "length": "条件は8文字以上必要です",
+                            "musthashtag": "ハッシュタグが必要です",
+                            "mustmention": "ラベラーアカウントのメンションが必須です"
                         }
                     },
                     "durationInHours": {
@@ -215,18 +215,22 @@
                 }
             },
             "settings": {
-                "field":{
-                    "delay":{
-                    "title":"Jetstream受信",
-                    "queue":"自動ラベル処理",
-                    "nodelay":"遅延なし",
-                    "description":"{minute}分遅延しています"
+                "field": {
+                    "delay": {
+                        "title": "Jetstream受信",
+                        "queue": "自動ラベル処理",
+                        "nodelay": "遅延なし",
+                        "description": "{minute}分遅延しています"
                     }
                 },
-                "inform":{
-                    "serverdown" : "自動ラベルサーバーがダウンしています。RailwayでRestartしてください。"
+                "inform": {
+                    "serverdown": "自動ラベルサーバーがダウンしています。RailwayでRestartしてください。"
                 }
             }
         }
+    },
+    "footer": {
+        "termofuse": "利用規約",
+        "privacyPolicy": "プライバシーポリシー"
     }
 }

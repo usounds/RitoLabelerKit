@@ -3,6 +3,7 @@
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import Header from '@/components/Header/Header';
+import {Footer} from '@/components/footer/Footer';
 import { createTheme, MantineColorsTuple } from '@mantine/core';
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
 import { NextIntlClientProvider, hasLocale } from "next-intl";
@@ -90,6 +91,7 @@ export default async function RootLayout({
             <Header />
             <Notifications />
             {children}
+          <Footer locale='ja'/>
           </MantineProvider>
         </NextIntlClientProvider>
       </body>
