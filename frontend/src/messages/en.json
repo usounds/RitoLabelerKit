@@ -189,13 +189,13 @@
           },
           "appliedTo": {
             "title": "Apply label to",
-            "description": "Select whether to apply to a post or an account",
+            "description": "Choose post or account. Currently, only posts are supported.",
             "account": "Account",
             "post": "Post"
           },
           "condition": {
             "title": "Condition",
-            "description": "Triggers based on the content of this post.",
+            "description": "Apply a label to posts containing a specific hashtag. Specify the hashtag.",
             "placeholder": "@label.rito.blue Please apply the Dog label",
             "message": {
               "length": "The condition must be at least 8 characters long",

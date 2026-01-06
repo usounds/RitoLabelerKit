@@ -189,13 +189,13 @@
                     },
                     "appliedTo": {
                         "title": "ラベルの適用先",
-                        "description": "ポストかアカウントを選択",
+                        "description": "ポストかアカウントを選択。現在は「ポスト」のみをサポートします",
                         "account": "アカウント",
                         "post": "ポスト"
                     },
                     "condition": {
                         "title": "条件",
-                        "description": "このポストの本文に反応します。",
+                        "description": "特定のハッシュタグを含む投稿にラベルできます。そのハッシュタグを指定してください。",
                         "placeholder": "@label.rito.blue 戌のラベルを貼って",
                         "message": {
                             "length": "条件は8文字以上必要です",

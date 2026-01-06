@@ -61,8 +61,8 @@ export default function PostForm({
   const form = useForm<ManageFormValues>({
     initialValues: {
       label: prev?.label || '',
-      appliedTo: (prev?.appliedTo || 'account') as AppliedTo,
-      condition: prev?.condition || '@' + userProf?.handle + ' ',
+      appliedTo: (prev?.appliedTo || 'post') as AppliedTo,
+      condition: prev?.condition || '#any.hastag',
       durationInHours: prev?.durationInHours || 0,
       action: 'add',
     },
@@ -219,7 +219,7 @@ export default function PostForm({
           {...form.getInputProps('appliedTo')}
         >
           <Group mt="xs">
-            <Radio value="account" label={t('field.appliedTo.account')} />
+            <Radio value="account" label={t('field.appliedTo.account')} disabled={true}/>
             <Radio value="post" label={t('field.appliedTo.post')} />
           </Group>
         </Radio.Group>
