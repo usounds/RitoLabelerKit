@@ -100,6 +100,7 @@
             "finalConfirm": "秘密鍵を埋め込みます。続行してもよろしいですか？"
         },
         "manage": {
+            "title": "コンソール",
             "tab": {
                 "label": "ラベル",
                 "like": "いいね",
@@ -109,7 +110,9 @@
                 "manual": "手動"
             },
             "message": {
-                "notRunning": "Rito Labeler Litが {domain} で稼働していないようです。セットアップまたは稼働を確認してください。"
+                "notRunning": "Rito Labeler Litが {domain} で稼働していないようです。セットアップまたは稼働を確認してください。",
+                "statusUpdated": "最新の状態に更新しました",
+                "updatingStatus": "ステータスを更新中です..."
             },
             "button": {
                 "logout": "ログアウト"

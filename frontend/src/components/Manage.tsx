@@ -10,6 +10,7 @@ import { BlueRitoLabelAutoLikeWithRkey, BlueRitoLabelAutoPostWithRkey, useManage
 import { useXrpcAgentStore } from "@/lib/XrpcAgent";
 import { OAuthUserAgent, deleteStoredSession, getSession } from '@atcute/oauth-browser-client';
 import { Alert, Button, Group, SimpleGrid, Tabs } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { Cog, FilePenLine, Heart, MessageCircleWarning, Pickaxe, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -27,6 +28,9 @@ export default function Manage() {
     const autoLabelingQueueCursor = useManageStore(state => state.autoLabelingQueueCursor);
     const serviceEndpoint = useManageStore(state => state.serviceEndpoint);
     const setUseLike = useManageStore(state => state.setUseLike);
+    const setAutoLabelingVersion = useManageStore(state => state.setAutoLabelingVersion);
+    const setAutoLabelingJetstreamCursor = useManageStore(state => state.setAutoLabelingJetstreamCursor);
+    const setAutoLabelingQueueCursor = useManageStore(state => state.setAutoLabelingQueueCursor);
     const isAutoLabelingAvailable = useManageStore(state => state.isAutoLabelingAvailable);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -49,11 +53,61 @@ export default function Manage() {
         if (!serviceEndpoint) return []
         if (!isPlcOrWebDid(activeDid)) return []
 
-
         const getRecord = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.auto.post.getSettings`)
-        const records = getRecord.json() as unknown as BlueRitoLabelAutoPostWithRkey[];
+        const records = await getRecord.json() as unknown as BlueRitoLabelAutoPostWithRkey[];
 
         return records;
+    }
+
+    async function refreshServiceStatus() {
+        if (!serviceEndpoint) return;
+        const notificationId = 'refreshing-status';
+        notifications.show({
+            id: notificationId,
+            title: t('title'),
+            message: t('message.updatingStatus'),
+            loading: true,
+            autoClose: false,
+            withCloseButton: false,
+        });
+
+        try {
+            const domain = new URL(serviceEndpoint).hostname;
+            const res = await fetch(`https://${domain}/xrpc/blue.rito.label.auto.getServiceStatus`)
+            if (res.ok) {
+                const resultbody = await res.json()
+                setAutoLabelingVersion(resultbody.version)
+                setAutoLabelingJetstreamCursor(new Date(resultbody.jetstreamCursor))
+                setAutoLabelingQueueCursor(new Date(resultbody.queueCursor))
+                notifications.update({
+                    id: notificationId,
+                    title: t('title'),
+                    message: t('message.statusUpdated'),
+                    color: "blue",
+                    loading: false,
+                    autoClose: 1000,
+                })
+            } else {
+                notifications.update({
+                    id: notificationId,
+                    title: t('title'),
+                    message: "Failed to update status",
+                    color: "red",
+                    loading: false,
+                    autoClose: 2000,
+                })
+            }
+        } catch (e) {
+            console.error(e)
+            notifications.update({
+                id: notificationId,
+                title: t('title'),
+                message: "Error updating status",
+                color: "red",
+                loading: false,
+                autoClose: 2000,
+            })
+        }
     }
 
     useEffect(() => {
@@ -151,6 +205,7 @@ export default function Manage() {
                             from={autoLabelingCursor!}
                             to={to}
                             title={t('settings.field.delay.title')}
+                            onClick={refreshServiceStatus}
                         />
                     )}
 
@@ -159,6 +214,7 @@ export default function Manage() {
                             from={autoLabelingQueueCursor!}
                             to={autoLabelingCursor!}
                             title={t('settings.field.delay.queue')}
+                            onClick={refreshServiceStatus}
                         />
                     )}
                 </SimpleGrid>

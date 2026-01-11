@@ -100,6 +100,7 @@
       "finalConfirm": "The secret key will be embedded. Do you want to continue?"
     },
     "manage": {
+      "title": "Console",
       "tab": {
         "label": "Labels",
         "like": "Likes",
@@ -109,7 +110,9 @@
         "manual": "Manual"
       },
       "message": {
-        "notRunning": "Rito Labeler Kit does not appear to be running at {domain}. Please check the setup or confirm that it is running."
+        "notRunning": "Rito Labeler Kit does not appear to be running at {domain}. Please check the setup or confirm that it is running.",
+        "statusUpdated": "Status updated",
+        "updatingStatus": "Updating status..."
       },
       "button": {
         "logout": "Log Out"
