@@ -48,7 +48,8 @@
         },
         "message": {
             "loading": "設定を読み込み中です...",
-            "versionUp": "Auto Labeling Serviceの最新版がリリースされました。RailwayからRedeployをして、バージョンアップしてください。"
+            "versionUp": "Auto Labeling Serviceの最新版がリリースされました。RailwayからRedeployをして、バージョンアップしてください。",
+            "autoLabelingNotRunning": "エンドポイントにてRito Labeling Serviceが稼働していないようです"
         },
         "initlal": {
             "title": {
@@ -230,17 +231,17 @@
             },
             "manual": {
                 "field": {
-                    "user":{
+                    "user": {
                         "title": "ユーザー",
-                        "description" :"ラベルを操作するユーザーを選択"
+                        "description": "ラベルを操作するユーザーを選択"
                     },
-                    "label":{
+                    "label": {
                         "title": "ラベル",
-                        "description" :"ラベルを選択"
+                        "description": "ラベルを選択"
                     }
                 },
-                "button":{
-                    "save":"保存"
+                "button": {
+                    "save": "保存"
                 },
                 "inform": {
                     "completed": "ラベルを反映しました",

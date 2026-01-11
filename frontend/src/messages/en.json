@@ -48,7 +48,8 @@
     },
     "message": {
       "loading": "Loading settings...",
-      "versionUp": "A new version of the Auto Labeling Service has been released. Please redeploy from Railway to upgrade."
+      "versionUp": "A new version of the Auto Labeling Service has been released. Please redeploy from Railway to upgrade.",
+      "autoLabelingNotRunning": "It seems that Rito Labeling Service is not running at the endpoint."
     },
     "initlal": {
       "title": {
@@ -228,25 +229,25 @@
           "serverdown": "The automatic labeling server is down. Please restart it on Railway."
         }
       },
-            "manual": {
-                "field": {
-                    "user":{
-                        "title": "User",
-                        "description" :"Chooses user who change labels"
-                    },
-                    "label":{
-                        "title": "Label",
-                        "description" :"Select labels"
-                    }
-                },
-                "button":{
-                    "save":"Save"
-                },
-                "inform": {
-                    "completed": "Label applied!",
-                    "nohandle": "No handle"
-                }
-            }
+      "manual": {
+        "field": {
+          "user": {
+            "title": "User",
+            "description": "Chooses user who change labels"
+          },
+          "label": {
+            "title": "Label",
+            "description": "Select labels"
+          }
+        },
+        "button": {
+          "save": "Save"
+        },
+        "inform": {
+          "completed": "Label applied!",
+          "nohandle": "No handle"
+        }
+      }
     }
   },
   "footer": {

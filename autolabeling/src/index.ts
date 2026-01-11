@@ -59,6 +59,7 @@ if (process.env.LABELER_DID === 'DUMMY') {
 
 let jetstreamCursor = 0;
 let queueCursor = 0;
+let lastProcessedTime = Date.now();
 let prev_time_us = 0
 let cursorUpdateInterval: NodeJS.Timeout;
 function compilePostRule(row: PostRecord): PostRecord {
@@ -164,6 +165,7 @@ function handlePostEvent(rkey: string, data: {
 // 共通処理
 function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.post'> | CommitUpdateEvent<'blue.rito.label.auto.post'>) {
     jetstreamCursor = event.time_us;
+    lastProcessedTime = Date.now();
 
     if (process.env.LABELER_DID === event.did) {
         enqueue(async () => {
@@ -187,7 +189,6 @@ function handlePostEventWrapper(event: CommitCreateEvent<'blue.rito.label.auto.p
 }
 
 
-// 共通処理
 function handlePreferenceEventWrapper(event:
     CommitCreateEvent<'app.bsky.labeler.service'> |
     CommitUpdateEvent<'app.bsky.labeler.service'> |
@@ -196,6 +197,7 @@ function handlePreferenceEventWrapper(event:
 
 ) {
     jetstreamCursor = event.time_us;
+    lastProcessedTime = Date.now();
 
     if (process.env.LABELER_DID === event.did) {
         enqueue(async () => {
@@ -215,6 +217,7 @@ function handlePreferenceDeleteEventWrapper(event:
 
 ) {
     jetstreamCursor = event.time_us;
+    lastProcessedTime = Date.now();
 
     if (process.env.LABELER_DID === event.did) {
         enqueue(async () => {
@@ -302,7 +305,7 @@ function startJetstream() {
     jetstream.on('connected', () => {
         connecting = false;
         connected = true;
-        logger.info('Jetstream connected');
+        logger.info('Jetstream connected (connected event)');
     });
 
     // 切断時
@@ -318,6 +321,9 @@ function startJetstream() {
     // エラー時
     jetstream.on('error', (err) => {
         logger.error(err, 'Jetstream error:');
+        connecting = false;
+        connected = false;
+        // インスタンスは破棄せず、再試行に任せる
         scheduleReconnect();
     });
 
@@ -341,6 +347,7 @@ function startJetstream() {
 
     jetstream.onDelete('blue.rito.label.auto.post', (event: CommitDeleteEvent<'blue.rito.label.auto.post'>) => {
         jetstreamCursor = event.time_us;
+        lastProcessedTime = Date.now();
 
         // 自分が作成したラベルのみ処理
         if (process.env.LABELER_DID === event.did) {
@@ -366,6 +373,7 @@ function startJetstream() {
 
     jetstream.onCreate('app.bsky.feed.post', (event: CommitCreateEvent<'app.bsky.feed.post'>) => {
         jetstreamCursor = event.time_us;
+        lastProcessedTime = Date.now();
 
         enqueue(async () => {
             type AutoLikePost = AppBskyFeedPost.Main & {
@@ -425,6 +433,7 @@ function startJetstream() {
 
     jetstream.onDelete('app.bsky.feed.post', (event: CommitDeleteEvent<'app.bsky.feed.post'>) => {
         jetstreamCursor = event.time_us;
+        lastProcessedTime = Date.now();
         const aturi = `at://${event.did}/app.bsky.feed.post/${event.commit.rkey}`
         const like = memoryDB.likes.find(l => l.subject === aturi);
 
@@ -447,6 +456,7 @@ function startJetstream() {
     // --- Jetstream Like create ---
     jetstream.onCreate('app.bsky.feed.like', (event: CommitCreateEvent<'app.bsky.feed.like'>) => {
         jetstreamCursor = event.time_us;
+        lastProcessedTime = Date.now();
         enqueue(async () => {
             try {
                 const likeUri = `at://${event.did}/app.bsky.feed.like/${event.commit.rkey}`;
@@ -482,6 +492,7 @@ function startJetstream() {
     // --- Jetstream Like delete ---
     jetstream.onDelete('app.bsky.feed.like', (event: CommitDeleteEvent<'app.bsky.feed.like'>) => {
         jetstreamCursor = event.time_us;
+        lastProcessedTime = Date.now();
         enqueue(async () => {
             try {
                 const likeUri = `at://${event.did}/app.bsky.feed.like/${event.commit.rkey}`;
@@ -517,7 +528,7 @@ function startJetstream() {
     cursorUpdateInterval = setInterval(() => {
         if (jetstream?.cursor) {
             logger.info(
-                `jetstreamCursor="${epochUsToDateTime(jetstreamCursor)}" queueCursor="${epochUsToDateTime(queueCursor)}" size=${queue.size} pending=${queue.pending}`
+                `jetstreamCursor="${epochUsToDateTime(jetstreamCursor)}" queueCursor="${epochUsToDateTime(queueCursor)}" connected=${connected} size=${queue.size} pending=${queue.pending}`
             );
 
             // DB に保存
@@ -528,13 +539,25 @@ function startJetstream() {
             }
 
             if (prev_time_us === jetstream.cursor) {
-                logger.info(`The time_us has not changed since the last check, reconnecting.`);
-                process.exit(1)
+                // 30秒間 cursor が動いていない
+                const inactiveMs = Date.now() - lastProcessedTime;
+                if (inactiveMs > 120000) { // 2分間イベントが届いていない
+                    logger.error(`Jetstream stuck or no events received for ${inactiveMs}ms, exiting for auto-restart.`);
+                    process.exit(1);
+                }
             } else {
                 prev_time_us = jetstream.cursor;
-
+                lastProcessedTime = Date.now();
             }
 
+        } else {
+            // jetstream が null または cursor が取れない状態
+            const inactiveMs = Date.now() - lastProcessedTime;
+            logger.info(`Jetstream not active. inactiveMs=${inactiveMs}ms connected=${connected} connecting=${connecting}`);
+            if (inactiveMs > 120000) { // 2分間繋がっていない
+                logger.error(`Disconnected from Jetstream for too long, exiting for auto-restart.`);
+                process.exit(1);
+            }
         }
     }, intervalMs);
 }
@@ -571,7 +594,20 @@ const port = parseInt(process.env.PORT || '8080');
 const hostname = process.env.HOST_NAME || '0.0.0.0';
 
 const app = new Hono();
-app.get('/', c => c.text('OK'));
+app.get('/', c => {
+    if (connected) {
+        return c.text('OK');
+    } else {
+        return c.text('Service Unavailable: Jetstream disconnected', 503);
+    }
+});
+app.get('/health', c => {
+    if (connected) {
+        return c.json({ status: 'OK', connected, lastProcessedTime: new Date(lastProcessedTime).toISOString() });
+    } else {
+        return c.json({ status: 'Error', connected, lastProcessedTime: new Date(lastProcessedTime).toISOString() }, 503);
+    }
+});
 app.get('/xrpc/blue.rito.label.auto.getServiceStatus', (c) => {
     return c.json({
         version: cursorPkg.version,

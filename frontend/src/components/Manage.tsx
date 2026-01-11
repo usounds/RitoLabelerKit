@@ -27,6 +27,7 @@ export default function Manage() {
     const autoLabelingQueueCursor = useManageStore(state => state.autoLabelingQueueCursor);
     const serviceEndpoint = useManageStore(state => state.serviceEndpoint);
     const setUseLike = useManageStore(state => state.setUseLike);
+    const isAutoLabelingAvailable = useManageStore(state => state.isAutoLabelingAvailable);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const locale = useLocale();
@@ -62,6 +63,7 @@ export default function Manage() {
 
         if (!isPlcOrWebDid(activeDid)) return
         const handleOnLoad = async () => {
+            if (!isAutoLabelingAvailable) return
 
             const getLikeSettings = await fetch(`${serviceEndpoint}/xrpc/blue.rito.label.getSetting?nsid=blue.rito.label.auto.like.settings`)
 
@@ -112,10 +114,10 @@ export default function Manage() {
                 <Tabs.Tab value="label" leftSection={<Tag size={14} />}>
                     {t('tab.label')}
                 </Tabs.Tab>
-                <Tabs.Tab value="like" leftSection={<Heart size={14} />}>
+                <Tabs.Tab value="like" leftSection={<Heart size={14} />} disabled={!isAutoLabelingAvailable}>
                     {t('tab.like')}
                 </Tabs.Tab>
-                <Tabs.Tab value="post" leftSection={<FilePenLine size={14} />}>
+                <Tabs.Tab value="post" leftSection={<FilePenLine size={14} />} disabled={!isAutoLabelingAvailable}>
                     {t('tab.post')}
                 </Tabs.Tab>
                 <Tabs.Tab value="manual" leftSection={<Pickaxe size={14} />}>

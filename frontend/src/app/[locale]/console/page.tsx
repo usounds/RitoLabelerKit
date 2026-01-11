@@ -25,6 +25,7 @@ export default function Console() {
     const setAutoLabelingJetstreamCursor = useManageStore(state => state.setAutoLabelingJetstreamCursor);
     const setAutoLabelingQueueCursor = useManageStore(state => state.setAutoLabelingQueueCursor);
     const setServiceEndpoint = useManageStore(state => state.setServiceEndpoint);
+    const setIsAutoLabelingAvailable = useManageStore(state => state.setIsAutoLabelingAvailable);
     const setLabelerDef = useManageStore(state => state.setLabelerDef);
     const userProf = useXrpcAgentStore(state => state.userProf);
     const activeDid = useXrpcAgentStore(state => state.activeDid);
@@ -96,30 +97,65 @@ export default function Console() {
                     }
 
                     setMode('manage');
-                    const result2 = await fetch(`https://${domain}/xrpc/blue.rito.label.auto.getServiceStatus`)
+                    try {
+                        const serviceStatusResponse = await fetch(`https://${domain}/xrpc/blue.rito.label.auto.getServiceStatus`)
 
-                    const resultbody = await result2.json() as BlueRitoLabelAutoGetServiceStatus.$output
+                        if (serviceStatusResponse.ok) {
+                            const resultbody = await serviceStatusResponse.json() as BlueRitoLabelAutoGetServiceStatus.$output
 
-                    setAutoLabelingVersion(resultbody.version)
-                    setAutoLabelingJetstreamCursor(new Date(resultbody.jetstreamCursor))
-                    setAutoLabelingQueueCursor(new Date(resultbody.queueCursor))
+                            setAutoLabelingVersion(resultbody.version)
+                            setAutoLabelingJetstreamCursor(new Date(resultbody.jetstreamCursor))
+                            setAutoLabelingQueueCursor(new Date(resultbody.queueCursor))
+                            setIsAutoLabelingAvailable(true)
 
-                    if (semver.lte(resultbody.version, '0.1.3')) {
+                            if (semver.lte(resultbody.version, '0.1.5')) {
+                                notifications.show({
+                                    id: 'login-process',
+                                    title: t('title'),
+                                    color: "red",
+                                    message: t('message.versionUp'),
+                                });
+                            }
+                        } else {
+                            setIsAutoLabelingAvailable(false)
+                            notifications.show({
+                                id: 'autolabeling-status',
+                                title: t('title'),
+                                color: "red",
+                                message: t('message.autoLabelingNotRunning'),
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Failed to fetch service status", e)
+                        setIsAutoLabelingAvailable(false)
                         notifications.show({
-                            id: 'login-process',
+                            id: 'autolabeling-status',
                             title: t('title'),
                             color: "red",
-                            message: t('message.versionUp'),
+                            message: t('message.autoLabelingNotRunning'),
                         });
                     }
 
 
-                    const result = await fetch(`https://${domain}/xrpc/_health`)
-                    const body = await result.json() as { version: string }
-                    if (body.version) {
-                        setLabelerVersion(body.version)
-                    } else {
-
+                    try {
+                        const healthCheckResponse = await fetch(`https://${domain}/xrpc/_health`)
+                        if (healthCheckResponse.ok) {
+                            const body = await healthCheckResponse.json() as { version: string }
+                            if (body.version) {
+                                setLabelerVersion(body.version)
+                            }
+                        } else {
+                            notifications.show({
+                                id: 'login-process',
+                                title: t('title'),
+                                color: "red",
+                                message: t('manage.message.notRunning', {
+                                    domain: domain ?? 'unknown',
+                                }),
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Failed to fetch health check", e)
                         notifications.show({
                             id: 'login-process',
                             title: t('title'),
