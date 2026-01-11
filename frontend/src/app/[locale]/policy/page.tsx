@@ -8,6 +8,12 @@ interface PageProps {
   params: { locale: string };
 }
 
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'ja' }];
+}
+
 export default async function PrivacyPage({ params }: PageProps) {
   const { locale } = await params;
   const t = await getTranslations({ locale });
