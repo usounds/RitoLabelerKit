@@ -82,7 +82,7 @@ export default function Manage() {
         }
 
         handleOnLoad()
-    }, [activeDid, thisClient, serviceEndpoint]);
+    }, [activeDid, thisClient, serviceEndpoint, isAutoLabelingAvailable]);
 
     const logout = async () => {
         if (!activeDid) return
